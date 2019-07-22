@@ -46,7 +46,7 @@ class rand_1_1;
 
     function string make_rand();
         string ret_str;
-        this.randomize();
+        assert( this.randomize() ) else $stop;
         $sformat(ret_str,"| 0x%h | 0x%h | 0b%b | 0x%b(%s) |", data, addr, strob, mode, mode == 3'b000 ? "BUSY " : mode == 3'b001 ? "READ " : mode == 3'b010 ? "WRITE" : mode == 3'b100 ? "ERROR" : "UNK  " );
         return ret_str;
     endfunction : make_rand
@@ -139,7 +139,7 @@ class cover_2_1;
         }
 
         strob_cp : coverpoint strob {
-            bins    strob_avaible[] = { 4'b0001, 4'b0011, 4'b0111, 4'b1111, 4'b1110, 4'b1100, 4'b1000 };
+            bins    strob_available[] = { 4'b0001, 4'b0011, 4'b0111, 4'b1111, 4'b1110, 4'b1100, 4'b1000 };
         }
 
         data_cp : coverpoint data {
@@ -218,7 +218,6 @@ module task_12_1;
 
     initial
     begin
-        rand_tr[0] = "Hello";
         rand_1_1_.set_max_addr(32'h1000);
         rand_1_1_.set_min_addr(32'h0500);
         $display("|    DATA    |    ADDR    | STROBE |     MODE     |");

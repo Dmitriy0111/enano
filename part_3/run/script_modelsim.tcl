@@ -3,8 +3,8 @@ vlib work
 
 set test "task_12_1"
 set test "task_12_2"
-#set test "task_12_3"
-#set test "task_12_4"
+set test "task_12_3"
+set test "task_12_4"
 
 # compile testbench files
 vlog -f ../run/tb.f
@@ -21,5 +21,7 @@ if {$test=="task_12_1"} {
 
 # run simulation
 run -all
+
+coverage report -detail -cvg -directive -comments -file ../fcover_report.txt -r /
 
 quit 
