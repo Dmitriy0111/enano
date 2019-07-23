@@ -20,7 +20,7 @@ show_pwd:
 
 clean: \
 	sim_clean \
-	log_cover_clean
+	log_clean
 
 sim_all: \
 	sim_cmd 
@@ -55,6 +55,5 @@ sim_cmd: sim_dir
 sim_gui: sim_dir
 	$(VSIM_BIN) $(VSIM_OPT_COMMON) $(VSIM_OPT_GUI) &
 
-log_cover_clean:
+log_clean:
 	rm -rfd .log
-	rm -rfd fcover_report.txt
