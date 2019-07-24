@@ -9,7 +9,7 @@ import task_3_uart_pkg::*;
 class uart_sequencer extends uvm_sequencer #(uart_item);
     `uvm_component_utils(uart_sequencer)
 
-    function new(string name = "uart_sequencer", uvm_component parent = null);
+    function new(string name, uvm_component parent = null);
         super.new(name, parent);
     endfunction : new
 

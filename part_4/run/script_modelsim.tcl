@@ -6,6 +6,7 @@ set test "task_2_apb"
 set test "task_1_uart"
 set test "task_2_uart"
 set test "task_3_uart"
+#set test "task_3_apb"
 
 if {$test=="task_1_apb"} {    
     # compile testbench files
@@ -26,7 +27,14 @@ if {$test=="task_1_apb"} {
 } elseif {$test=="task_3_uart"} {
     # compile testbench files
     vlog -f ../run/tb_task_3.f
-    vsim -novopt work.top    
+    #vsim -novopt work.top +UVM_VERBOSITY=UVM_DEBUG
+    vsim -novopt work.top
+    add wave -position insertpoint sim:/top/uart_if_/*
+} elseif {$test=="task_3_apb"} {
+    # compile testbench files
+    vlog -f ../run/tb_task_3_ex.f 
+    #vsim -novopt work.top +UVM_VERBOSITY=UVM_DEBUG
+    vsim -novopt work.top
 }
 
 # run simulation

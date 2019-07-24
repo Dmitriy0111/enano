@@ -8,12 +8,13 @@ import task_3_uart_pkg::*;
 
 class uart_agent extends uvm_agent;
 
+    typedef virtual uart_if uart_vif;
+
     uart_sequencer  sqr;
     uart_driver     drv;
     uart_monitor    mon;
-
-    virtual uart_if uart_if_;
     uart_agent_cfg  cfg;
+    uart_vif        uart_if_;
 
     `uvm_component_utils_begin(uart_agent)
         `uvm_field_object( sqr , UVM_ALL_ON )
@@ -22,7 +23,7 @@ class uart_agent extends uvm_agent;
         `uvm_field_object( cfg , UVM_ALL_ON )
     `uvm_component_utils_end
 
-    function new(string name = "uart_agent", uvm_component parent = null);
+    function new(string name, uvm_component parent = null);
         super.new(name, parent);
     endfunction : new
 
@@ -52,15 +53,15 @@ class uart_agent extends uvm_agent;
         end
         mon = uart_monitor::type_id::create("mon", this);
         uvm_config_db#(uart_agent_cfg)::set(this, "mon", "uart_cfg", cfg);
-        if (!uvm_config_db#(virtual uart_if)::get(this, "", "uart_if", uart_if_)) 
+        if (!uvm_config_db#(uart_vif)::get(this, "", "uart_vif", uart_if_)) 
         begin
-            `uvm_fatal("APB/AGT/NOuart_if_", "No virtual interface specified for this agent instance")
+            `uvm_fatal("APB/AGT/NOVIF", "No virtual interface specified for this agent instance")
         end
-        uvm_config_db#(virtual uart_if)::set(this, "drv", "uart_if", uart_if_);
-        uvm_config_db#(virtual uart_if)::set(this, "mon", "uart_if", uart_if_);
+        uvm_config_db#(uart_vif)::set(this, "drv", "uart_vif", uart_if_);
+        uvm_config_db#(uart_vif)::set(this, "mon", "uart_vif", uart_if_);
     endfunction : build_phase
 
-    function void connect_phase(uvm_phase phase);
+    virtual function void connect_phase(uvm_phase phase);
         drv.seq_item_port.connect(sqr.seq_item_export);
     endfunction : connect_phase
 

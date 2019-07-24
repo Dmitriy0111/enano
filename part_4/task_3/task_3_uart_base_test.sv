@@ -8,8 +8,11 @@ import task_3_uart_pkg::*;
 
 class uart_base_test extends uvm_test;
 
+    typedef virtual uart_if uart_vif;
+
     uart_env env;
-    virtual uart_if uart_if_;
+    uart_vif uart_if_;
+
     `uvm_component_utils(uart_base_test)
 
     function new(string name, uvm_component parent = null);
@@ -21,9 +24,9 @@ class uart_base_test extends uvm_test;
     endfunction : build_phase
 
     function void start_of_simulation_phase(uvm_phase phase);
-    // uvm_coreservice_t cs_ = uvm_coreservice_t::get();
-    // uvm_root top = cs_.get_root();
-    // $cast(env, top.find("env"));
+        // uvm_coreservice_t cs_ = uvm_coreservice_t::get();
+        // uvm_root top = cs_.get_root();
+        // $cast(env, top.find("env"));
         `uvm_info ("BASE_TEST","all test env was built", UVM_LOW)
     endfunction : start_of_simulation_phase
 

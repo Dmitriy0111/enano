@@ -23,7 +23,8 @@ class uart_item extends uvm_sequence_item;
     `uvm_object_utils_end
 
     constraint baudrate_c {
-        baudrate inside { 9600 , 19200 , 38400 , 57600 , 115200 };
+        //baudrate inside { 9600 , 19200 , 38400 , 57600 , 115200 };
+        baudrate inside { 115200 };
     }
 
     constraint delay_c {

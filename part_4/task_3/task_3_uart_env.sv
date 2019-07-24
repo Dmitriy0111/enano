@@ -8,22 +8,24 @@ import task_3_uart_pkg::*;
 
 class uart_env extends uvm_env;
 
-    uart_agent uart_agent_;
-    virtual uart_if uart_if_;
+    typedef virtual uart_if uart_vif;
+
+    uart_agent  uart_agent_;
+    uart_vif    uart_if_;
 
     `uvm_component_utils(uart_env)
 
     function new(string name, uvm_component parent = null);
         super.new(name, parent);
-    endfunction
+    endfunction : new
 
     function void build_phase(uvm_phase phase);
-        if (!uvm_config_db#(virtual uart_if)::get(this, "", "uart_if", uart_if_))
+        if (!uvm_config_db#(uart_vif)::get(this, "", "uart_vif", uart_if_))
         begin
-            `uvm_fatal("TB/ENV/NOuart_if_", "No virtual interface specified for environment instance")
+            `uvm_fatal("TB/ENV/NOVIF", "No virtual interface specified for environment instance")
         end
-        uart_agent_ = uart_agent::type_id::create("uart_agent", this);
-        uvm_config_db#(virtual uart_if)::set(this, "uart_agent", "uart_if", uart_if_);
+        uart_agent_ = uart_agent::type_id::create("uart_agent_", this);
+        uvm_config_db#(uart_vif)::set(this, "uart_agent_", "uart_vif", uart_if_);
     endfunction : build_phase
 
     function void connect_phase(uvm_phase phase);
@@ -31,16 +33,16 @@ class uart_env extends uvm_env;
 
     task pre_reset_phase(uvm_phase phase);
         phase.raise_objection(this, "Waiting for reset to be valid");
-        //wait (top.uart_if_.resetn !== 1'bx);
+        wait (uart_if_.resetn !== 1'bx);
         phase.drop_objection(this, "Reset is no longer X");
     endtask : pre_reset_phase
 
     task reset_phase(uvm_phase phase);
         phase.raise_objection(this, "Asserting reset for 10 clock cycles");
         `uvm_info("TB/TRACE", "Resetting DUT...", UVM_NONE);
-        //top.uart_if_.resetn = 1'b1;
+        uart_if_.resetn = 1'b0;
         repeat (10) @(posedge uart_if_.clk);
-        //top.uart_if_.resetn = 1'b0;
+        uart_if_.resetn = 1'b1;
         phase.drop_objection(this, "HW reset done");
     endtask : reset_phase
 

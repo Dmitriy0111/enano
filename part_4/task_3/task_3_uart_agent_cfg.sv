@@ -7,14 +7,17 @@ import      uvm_pkg::*;
 import task_3_uart_pkg::*;
 
 class uart_agent_cfg extends uvm_object;
+
+    typedef virtual uart_if uart_vif;
+    
     bit     is_active = '1;
     bit     master    = '1;
 
-    virtual uart_if uart_if_;
+    uart_vif uart_if_;
 
     `uvm_object_utils_begin(uart_agent_cfg)
-        `uvm_field_int( is_active , UVM_DEFAULT );
-        `uvm_field_int( master    , UVM_DEFAULT );
+        `uvm_field_int( is_active , UVM_ALL_ON | UVM_NOPACK );
+        `uvm_field_int( master    , UVM_ALL_ON | UVM_NOPACK );
     `uvm_object_utils_end
 
     function new(string name = "uart_agent_cfg");
