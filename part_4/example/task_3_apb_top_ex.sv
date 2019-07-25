@@ -1,10 +1,10 @@
-import      uvm_pkg::*;
-`include    "uvm_macros.svh"
-
-import task_3_apb_pkg_ex::*;
-
 module top();
 
+    import      uvm_pkg::*;
+    `include    "uvm_macros.svh"
+    
+    import task_3_apb_pkg_ex::*;
+    
     reg         clk_i;
     reg         rst;
     real        freq = 3000000;

@@ -1,11 +1,6 @@
 `ifndef APB_BASE_TEST__SV
 `define APB_BASE_TEST__SV
 
-import      uvm_pkg::*;
-`include    "uvm_macros.svh"
-
-import task_3_apb_pkg_ex::*;
-
 class apb_base_test extends uvm_test;
 
     typedef virtual apb_if apb_vif; 

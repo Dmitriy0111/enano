@@ -1,11 +1,6 @@
 `ifndef APB_AGENT_CFG__SV
 `define APB_AGENT_CFG__SV
 
-import      uvm_pkg::*;
-`include    "uvm_macros.svh"
-
-import task_3_apb_pkg_ex::*;
-
 class apb_agent_cfg extends uvm_object;
 
     bit     [0 : 0]     is_active = 1;

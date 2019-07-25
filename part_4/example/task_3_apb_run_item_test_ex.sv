@@ -1,11 +1,6 @@
 `ifndef RUN_ITEM_TEST__SV
 `define RUN_ITEM_TEST__SV
 
-import      uvm_pkg::*;
-`include    "uvm_macros.svh"
-
-import task_3_apb_pkg_ex::*;
-
 class run_item_test extends apb_base_test;
 
     typedef apb_rand_seq RUN_SEQ;

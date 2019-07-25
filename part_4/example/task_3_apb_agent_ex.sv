@@ -1,11 +1,6 @@
 `ifndef APB_AGENT__SV
 `define APB_AGENT__SV
 
-import      uvm_pkg::*;
-`include    "uvm_macros.svh"
-
-import task_3_apb_pkg_ex::*;
-
 class apb_agent extends uvm_agent;
 
     typedef virtual apb_if apb_vif; 

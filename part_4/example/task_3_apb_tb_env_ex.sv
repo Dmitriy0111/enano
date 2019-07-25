@@ -1,11 +1,6 @@
 `ifndef TB_ENV__SV
 `define TB_ENV__SV
 
-import      uvm_pkg::*;
-`include    "uvm_macros.svh"
-
-import task_3_apb_pkg_ex::*;
-
 class tb_env extends uvm_env;
 
     typedef virtual apb_if apb_vif; 

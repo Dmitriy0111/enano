@@ -26,24 +26,27 @@ class uart_item extends uvm_sequence_item;
         delay > 0;
     }
 
-    function new(string name = "uart_item");
-        super.new(name);
-    endfunction : new
-
-    function string convert2string();
-        string s;
-        $sformat(   s,
-                    "| tx_data = 0x%h | stop = 0b%b(%s) | parity_en = 0b%b | baudrate = %d | delay = %d |",
-                    tx_data,
-                    stop,
-                    stop == 2'b00 ? "2 bits" : "unk   ",
-                    parity_en,
-                    baudrate,
-                    delay
-                );
-        return s;
-    endfunction : convert2string
-
+    extern function new(string name = "uart_item");
+    extern function string convert2string();
+        
 endclass : uart_item
+
+function uart_item::new(string name = "uart_item");
+    super.new(name);
+endfunction : new
+
+function string uart_item::convert2string();
+    string s;
+    $sformat(   s,
+                "| tx_data = 0x%h | stop = 0b%b(%s) | parity_en = 0b%b | baudrate = %d | delay = %d |",
+                tx_data,
+                stop,
+                stop == 2'b00 ? "2 bits" : "unk   ",
+                parity_en,
+                baudrate,
+                delay
+            );
+    return s;
+endfunction : convert2string
 
 `endif // UART_ITEM__SV

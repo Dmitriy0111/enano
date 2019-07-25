@@ -6,7 +6,7 @@ set test "task_2_apb"
 set test "task_1_uart"
 set test "task_2_uart"
 set test "task_3_uart"
-#set test "task_3_apb"
+set test "task_3_apb"
 
 if {$test=="task_1_apb"} {    
     # compile testbench files

@@ -1,11 +1,6 @@
 `ifndef UART_ENV__SV
 `define UART_ENV__SV
 
-import      uvm_pkg::*;
-`include    "uvm_macros.svh"
-
-import task_3_uart_pkg::*;
-
 class uart_env extends uvm_env;
 
     typedef virtual uart_if uart_vif;
@@ -69,7 +64,7 @@ class uart_env extends uvm_env;
         fork
         begin
             uvm_objection obj;
-            #2000000;
+            #200000000;
             obj = phase.get_objection();
             obj.display_objections();
             $finish;
@@ -78,7 +73,7 @@ class uart_env extends uvm_env;
             uvm_objection ph_obj = phase.get_objection();
             phase.raise_objection(this, "Additional configuration ISR");
             `uvm_info("TB/TRACE", "Run phase env ...", UVM_NONE);
-            #20000;
+            #2000000;
             `uvm_info("TB/TRACE", "Run phase env end...", UVM_NONE);
             phase.drop_objection(this, "Additional configuration ISR");
         end

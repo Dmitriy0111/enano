@@ -1,11 +1,6 @@
 `ifndef APB_MASTER__SV
 `define APB_MASTER__SV
 
-import      uvm_pkg::*;
-`include    "uvm_macros.svh"
-
-import task_3_apb_pkg_ex::*;
-
 class apb_master extends uvm_driver #(apb_item);
 
     typedef virtual apb_if apb_vif; 

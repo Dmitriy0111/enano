@@ -1,11 +1,6 @@
 `ifndef UART_BASE_TEST__SV
 `define UART_BASE_TEST__SV
 
-import      uvm_pkg::*;
-`include    "uvm_macros.svh"
-
-import task_3_uart_pkg::*;
-
 class uart_base_test extends uvm_test;
 
     typedef virtual uart_if uart_vif;

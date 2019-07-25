@@ -1,11 +1,6 @@
 `ifndef UART_MONITOR__SV
 `define UART_MONITOR__SV
 
-import      uvm_pkg::*;
-`include    "uvm_macros.svh"
-
-import task_3_uart_pkg::*;
-
 class uart_monitor extends uvm_monitor;
 
     typedef virtual uart_if uart_vif;
@@ -29,21 +24,29 @@ class uart_monitor extends uvm_monitor;
     endfunction : build_phase
 
     virtual task run_phase(uvm_phase phase);
+        logic   [15 : 0]    baudrate;
+        integer             tx_c;
         super.run_phase(phase);
         @(posedge uart_if_.resetn);
         forever 
         begin
             uart_item uart_item_;
             @(negedge uart_if_.uart_tx);
+            tx_c = 0;
+            baudrate = uart_if_.baudrate;
             uart_item_ = uart_item::type_id::create("uart_item_", this);
-            repeat(50_000_000/115200) @( posedge uart_if_.clk );
-            repeat(8)
+            repeat(baudrate) @( posedge uart_if_.clk );     // START
+            repeat(8)                                       // DATA
             begin
-                repeat(50_000_000/115200/2) @( posedge uart_if_.clk );
-                uart_item_.tx_data = { uart_if_.uart_tx , uart_item_.tx_data[7 : 1] };
-                repeat(50_000_000/115200/2) @( posedge uart_if_.clk );
+                repeat(baudrate)
+                begin
+                    @( posedge uart_if_.clk );
+                    tx_c += uart_if_.uart_tx;
+                end
+                uart_item_.tx_data = { ( tx_c > baudrate / 2 ) ? 1'b1 : 1'b0 , uart_item_.tx_data[7 : 1] };
+                tx_c = '0;
             end
-            repeat(50_000_000/115200) @( posedge uart_if_.clk );
+            repeat(baudrate) @( posedge uart_if_.clk );     // STOP
             ap.write(uart_item_);
             `uvm_info ("UART/MONITOR",$sformatf("Collect item: \n%s",uart_item_.convert2string()),UVM_LOW)
         end

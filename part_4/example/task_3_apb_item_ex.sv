@@ -1,11 +1,6 @@
 `ifndef APB_ITEM__SV
 `define APB_ITEM__SV
 
-import      uvm_pkg::*;
-`include    "uvm_macros.svh"
-
-import task_3_apb_pkg_ex::*;
-
 class apb_item extends uvm_sequence_item;
 
     typedef enum {READ, WRITE} kind_e;

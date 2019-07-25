@@ -1,11 +1,6 @@
 `ifndef UART_AGENT_CFG__SV
 `define UART_AGENT_CFG__SV
 
-import      uvm_pkg::*;
-`include    "uvm_macros.svh"
-
-import task_3_uart_pkg::*;
-
 class uart_agent_cfg extends uvm_object;
 
     typedef virtual uart_if uart_vif;

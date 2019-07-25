@@ -1,11 +1,6 @@
 `ifndef APB_RAND_SEQ__SV
 `define APB_RAND_SEQ__SV
 
-import      uvm_pkg::*;
-`include    "uvm_macros.svh"
-
-import task_3_apb_pkg_ex::*;
-
 class apb_rand_seq extends apb_base_seq;
 
     `uvm_object_utils(apb_rand_seq)

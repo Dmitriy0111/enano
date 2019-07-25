@@ -1,11 +1,6 @@
 `ifndef UART_DRIVER__SV
 `define UART_DRIVER__SV
 
-import      uvm_pkg::*;
-`include    "uvm_macros.svh"
-
-import task_3_uart_pkg::*;
-
 class uart_driver extends uvm_driver #(uart_item);
 
     typedef virtual uart_if uart_vif;

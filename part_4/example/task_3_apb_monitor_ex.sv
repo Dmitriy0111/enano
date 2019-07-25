@@ -1,11 +1,6 @@
 `ifndef APB_MONITOR__SV
 `define APB_MONITOR__SV
 
-import      uvm_pkg::*;
-`include    "uvm_macros.svh"
-
-import task_3_apb_pkg_ex::*;
-
 class apb_monitor extends uvm_monitor;
 
     typedef virtual apb_if apb_vif; 
