@@ -10,14 +10,14 @@ class uart_agent #(type uart_vif = virtual uart_if) extends uvm_agent;
     uart_monitor    uart_mon;
     uart_agent_cfg  uart_agt_cfg;
     uart_vif        uart_vif_;
-    uart_subscriber uart_subscriber_;   
+    uart_coverage   uart_cov;
 
     `uvm_component_utils_begin( uart_agent #( uart_vif ) )
-        `uvm_field_object( uart_sqr         , UVM_ALL_ON )
-        `uvm_field_object( uart_drv         , UVM_ALL_ON )
-        `uvm_field_object( uart_mon         , UVM_ALL_ON )
-        `uvm_field_object( uart_agt_cfg     , UVM_ALL_ON )
-        `uvm_field_object( uart_subscriber_ , UVM_ALL_ON )
+        `uvm_field_object( uart_sqr     , UVM_ALL_ON )
+        `uvm_field_object( uart_drv     , UVM_ALL_ON )
+        `uvm_field_object( uart_mon     , UVM_ALL_ON )
+        `uvm_field_object( uart_cov     , UVM_ALL_ON )
+        `uvm_field_object( uart_agt_cfg , UVM_ALL_ON )
     `uvm_component_utils_end
 
     extern function new(string name, uvm_component parent = null);
@@ -54,10 +54,12 @@ function void uart_agent::build_phase(uvm_phase phase);
         else 
         begin
             // create slave uart_agent
+            uart_sqr = uart_sequencer::type_id::create("uart_sqr", this);
+            uvm_config_db#(uart_agent_cfg)::set(this, "uart_sqr", "uart_cfg", uart_agt_cfg);
         end
     end
-    uart_subscriber_ = uart_subscriber::type_id::create("uart_subscriber_",this);
     uart_mon = uart_monitor#()::type_id::create("uart_mon", this);
+    uart_cov = uart_coverage::type_id::create("uart_cov", this);
     uvm_config_db#(uart_agent_cfg)::set(this, "uart_mon", "uart_cfg", uart_agt_cfg);
     if (!uvm_config_db#(uart_vif)::get(this, "", "uart_vif", uart_vif_)) 
     begin
@@ -73,9 +75,8 @@ function void uart_agent::connect_phase(uvm_phase phase);
             uart_drv.seq_item_port.connect(uart_sqr.seq_item_export);
         end
     end
-    this.agt_analysis_port.connect(uart_mon.mon_analysis_port);
-    //uart_subscriber_.connect(agt_analysis_port);
-    uart_mon.mon_analysis_port.connect(uart_subscriber_.analysis_export);
+    uart_mon.mon_analysis_port.connect(agt_analysis_port);
+    uart_mon.mon_analysis_port.connect(uart_cov.analysis_export);
 endfunction : connect_phase
 
 function void uart_agent::report_phase(uvm_phase phase);

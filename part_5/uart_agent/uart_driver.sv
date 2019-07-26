@@ -5,8 +5,10 @@
 
 class uart_driver #(type seq_item = uart_item, type uart_vif = virtual uart_if) extends uvm_driver #(seq_item);
     `uvm_component_param_utils( uart_driver #( seq_item , uart_vif ) );
+
+    integer     cycle = 0;
     
-    uart_vif uart_vif_;
+    uart_vif    uart_vif_;
     
     extern function new(string name = "uart_driver", uvm_component parent = null);
     extern virtual function void build_phase(uvm_phase phase);
@@ -61,16 +63,17 @@ task uart_driver::run_phase(uvm_phase phase);
         seq_item item;
         seq_item_port.get_next_item(item);
         @(posedge uart_vif_.clk);
-        $display(item.convert2string());
+        cycle++;
+        item.N = cycle;
         uart_vif_.tx_data   = item.tx_data;
         uart_vif_.stop      = item.stop;
         uart_vif_.parity_en = item.parity_en;
         uart_vif_.baudrate  = 50_000_000 / item.baudrate;
         uart_vif_.req = '1;
         `uvm_info   (
-                        get_type_name(),
-                        { "UART|DRV request transaction sending/n" , item.convert2string() },
-                        UVM_HIGH
+                        "UART|DRV",
+                        { "Request transaction sending\n" , item.convert2string() },
+                        UVM_LOW
                     );
         @(posedge uart_vif_.req_ack);
         uart_vif_.req = '0;

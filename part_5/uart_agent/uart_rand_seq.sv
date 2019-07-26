@@ -14,7 +14,7 @@ function uart_rand_seq::new(string name = "uart_rand_seq");
 endfunction : new
 
 task uart_rand_seq::body();
-    repeat(20)
+    repeat(100)
     begin
         uart_item_ = uart_item::type_id::create("uart_item");
         uart_item_.randomize();

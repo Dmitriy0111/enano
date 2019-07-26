@@ -3,6 +3,8 @@
 
 class uart_item extends uvm_sequence_item;
 
+    integer                     N = 0;
+
     rand    logic   [7  : 0]    tx_data;
     rand    logic   [1  : 0]    stop;
     rand    logic   [0  : 0]    parity_en;
@@ -10,6 +12,7 @@ class uart_item extends uvm_sequence_item;
     rand    integer             delay;
 
     `uvm_object_utils_begin(uart_item)
+        `uvm_field_int( N         , UVM_DEFAULT | UVM_HEX );
         `uvm_field_int( tx_data   , UVM_DEFAULT | UVM_HEX );
         `uvm_field_int( stop      , UVM_DEFAULT | UVM_HEX );
         `uvm_field_int( parity_en , UVM_DEFAULT | UVM_HEX );
@@ -23,7 +26,7 @@ class uart_item extends uvm_sequence_item;
 
     constraint delay_c {
         delay < 1000;
-        delay > 0;
+        delay > 100;
     }
 
     extern function new(string name = "uart_item");
@@ -38,10 +41,11 @@ endfunction : new
 function string uart_item::convert2string();
     string s;
     $sformat(   s,
-                "| tx_data = 0x%h | stop = 0b%b(%s) | parity_en = 0b%b | baudrate = %d | delay = %d |",
+                "| N = 0x%h | tx_data = 0x%h | stop = 0b%b(%s) | parity_en = 0b%b | baudrate = %d | delay = %d |",
+                N,
                 tx_data,
                 stop,
-                stop == 2'b00 ? "2 bits" : "unk   ",
+                stop == 2'b00 ? "0.5 bits" : stop == 2'b01 ? "1   bits" : stop == 2'b10 ? "1.5 bits" : stop == 2'b11 ? "2   bits" : "unk   ",
                 parity_en,
                 baudrate,
                 delay

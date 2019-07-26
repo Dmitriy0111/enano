@@ -9,8 +9,10 @@ class uart_monitor #(type seq_item = uart_item, type uart_vif = virtual uart_if)
     uvm_analysis_port   #( seq_item          )  mon_analysis_port;
     uvm_analysis_port   #( uvm_sequence_item )  item_collected_port;
     uvm_analysis_port   #( seq_item          )  predictor_port;
+
+    integer                                     cycle = 0;
     
-    uart_vif uart_vif_;
+    uart_vif                                    uart_vif_;
     
     extern function new(string name = "uart_monitor", uvm_component parent = null);
     extern virtual function void build_phase(uvm_phase phase);
@@ -20,6 +22,7 @@ class uart_monitor #(type seq_item = uart_item, type uart_vif = virtual uart_if)
     extern virtual task reset_phase(uvm_phase phase);
     extern virtual task configure_phase(uvm_phase phase);
     extern virtual task run_phase(uvm_phase phase);
+    extern task delay_find(uart_item uart_item_);
     
 endclass : uart_monitor
 
@@ -84,10 +87,29 @@ task uart_monitor::run_phase(uvm_phase phase);
             uart_item_.tx_data = { ( tx_c > baudrate / 2 ) ? 1'b1 : 1'b0 , uart_item_.tx_data[7 : 1] };
             tx_c = '0;
         end
-        repeat(baudrate) @( posedge uart_vif_.clk );    // STOP
-        mon_analysis_port.write(uart_item_);
-        `uvm_info ("UART/MON",$sformatf("Collect item: \n%s",uart_item_.convert2string()),UVM_LOW)
+        repeat(uart_vif_.stop)
+            repeat(baudrate/2) @( posedge uart_vif_.clk );  // STOP
+        uart_item_.baudrate = 50_000_000 / baudrate;
+        uart_item_.stop = uart_vif_.stop;
+        uart_item_.parity_en = uart_vif_.parity_en;
+        fork
+            delay_find(uart_item_);
+        join_none
     end
 endtask : run_phase
+
+task uart_monitor::delay_find(uart_item uart_item_);
+    integer     delay_c;
+    delay_c = 0;
+    while( uart_vif_.uart_tx )
+    begin
+        delay_c++;
+        @(posedge uart_vif_.clk);
+    end
+    cycle++;
+    uart_item_.N=cycle;
+    uart_item_.delay = delay_c;
+    mon_analysis_port.write(uart_item_);
+endtask : delay_find
 
 `endif // UART_MONITOR__SV

@@ -11,7 +11,7 @@ package uart_agent_pkg;
     `include "uart_base_seq.sv"
     `include "uart_rand_seq.sv"
     `include "uart_sequencer.sv"
-    `include "uart_subscriber.sv"
+    `include "uart_coverage.sv"
     `include "uart_agent.sv"
 
 endpackage : uart_agent_pkg
