@@ -15,6 +15,9 @@ class ahb_agent_cfg extends uvm_object;
 
     extern function new(string name = "ahb_agent_cfg");
     extern function void set_default();
+    extern function void set_passive();
+    extern function void set_master();
+    extern function void set_slave();
     
 endclass : ahb_agent_cfg
 
@@ -26,5 +29,19 @@ function void ahb_agent_cfg::set_default();
     is_active = '0;
     is_master = '0;
 endfunction : set_default
+
+function void axi_agent_cfg::set_passive();
+    is_active = '0;
+endfunction : set_passive
+
+function void axi_agent_cfg::set_master();
+    is_active = '1;
+    is_master = '1;
+endfunction : set_master
+
+function void axi_agent_cfg::set_slave();
+    is_active = '1;
+    is_master = '0;
+endfunction : set_slave
 
 `endif // AHB_AGENT_CFG__SV

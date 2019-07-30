@@ -19,7 +19,7 @@ task axi_run_test::main_phase(uvm_phase phase);
     phase.raise_objection(this);
     `uvm_info ("TB/TRACE/RUN_ITEM","start sequence", UVM_NONE)
     seq0 = axi_rand_seq::type_id::create("seq0");
-    seq0.start(env.axi_agt.axi_sqr);
+    seq0.start(env.axi_agt_0.axi_sqr);
     repeat(200) @(posedge vif.ACLK);
     `uvm_info ("TB/TRACE/RUN_ITEM","finish sequence", UVM_NONE)
     #1000;

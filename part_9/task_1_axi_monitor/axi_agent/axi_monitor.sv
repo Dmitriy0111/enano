@@ -15,12 +15,15 @@ class axi_monitor#(type axi_vif = virtual axi_if) extends uvm_monitor;
     integer         cycle_ar=0;
     integer         cycle_rd=0;
 
+    integer         wdata_size = 0;
+
     extern function new(string name = "axi_monitor", uvm_component parent = null);
     extern function void build_phase(uvm_phase phase);
     extern function void connect_phase(uvm_phase phase);
     extern task run_phase(uvm_phase phase);
     extern task pars_waddr_ch();
     extern task pars_wdata_ch();
+    extern task pars_raddr_ch();
    
 endclass : axi_monitor
 
@@ -42,39 +45,58 @@ endfunction : connect_phase
 task axi_monitor::run_phase(uvm_phase phase);
     forever
     fork
-        begin
-            @(posedge vif.ACLK);
-            if( vif.AWVALID )
-            begin
-                $display("| Address write channel cycle = %h", cycle_aw);
-                $display("| AWADDR  | %h", vif.AWADDR  );
-                $display("| AWLEN   | %h", vif.AWLEN   );
-                $display("| AWSIZE  | %h", vif.AWSIZE  );
-                $display("| AWBURST | %h\n", vif.AWBURST );
-                cycle_aw++;
-            end
-        end
-        begin
-            @(posedge vif.ACLK);
-            if(vif.WVALID)
-            begin
-                $display("| Data write channel cycle = %h", cycle_wd);
-                $display("| WDATA   | %h", vif.WDATA[96 +: 32]);
-                $display("| WDATA   | %h", vif.WDATA[64 +: 32]);
-                $display("| WDATA   | %h", vif.WDATA[32 +: 32]);
-                $display("| WDATA   | %h", vif.WDATA[0  +: 32]);
-                cycle_wd++;
-            end
-        end
-    join
+        pars_waddr_ch();
+        pars_wdata_ch();
+        pars_raddr_ch();
+    join_any
 endtask : run_phase
 
 task axi_monitor::pars_waddr_ch();
-    
+    @(posedge vif.ACLK);
+    #0;
+    if( vif.AWVALID )
+    begin
+        $display("| Address write channel cycle = %h", cycle_aw);
+        $display("| AWADDR  | %h", vif.AWADDR  );
+        $display("| AWLEN   | %h", vif.AWLEN   );
+        $display("| AWSIZE  | %h", vif.AWSIZE  );
+        $display("| AWBURST | %h\n", vif.AWBURST );
+        cycle_aw++;
+        wdata_size = vif.AWSIZE;
+    end
 endtask : pars_waddr_ch
 
+task axi_monitor::pars_raddr_ch();
+    @(posedge vif.ACLK);
+    #0;
+    if( vif.ARVALID )
+    begin
+        $display("| Address read channel cycle = %h", cycle_ar);
+        $display("| ARADDR  | %h",   vif.ARADDR  );
+        $display("| ARLEN   | %h",   vif.ARLEN   );
+        $display("| ARSIZE  | %h",   vif.ARSIZE  );
+        $display("| ARBURST | %h\n", vif.ARBURST );
+        cycle_ar++;
+        //wdata_size = vif.AWSIZE;
+    end
+endtask : pars_raddr_ch
+
 task axi_monitor::pars_wdata_ch();
-   
+    @(posedge vif.ACLK);
+    #0;
+    if(vif.WVALID)
+    begin
+        $display("| Data write channel cycle = %h", cycle_wd);
+        $display("| WDATA  |");
+        for(integer i = 1; i<=2**wdata_size; i++)
+        begin
+            $write(" %h ", vif.WDATA[(2**wdata_size-i)*8 +: 8]);
+            if( i % 16 == 0)
+                $write("\n");
+        end
+        $write("\n");
+        cycle_wd++;
+    end
 endtask : pars_wdata_ch
 
 `endif // AXI_MONITOR__SV

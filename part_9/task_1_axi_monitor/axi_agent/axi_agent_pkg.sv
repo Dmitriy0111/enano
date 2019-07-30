@@ -10,9 +10,9 @@ package axi_agent_pkg;
     `include "uvm_macros.svh"
     
     `include "axi_item.sv"
+    `include "axi_agent_cfg.sv"
     `include "axi_monitor.sv"
     `include "axi_driver.sv"
-    `include "axi_agent_cfg.sv"
     `include "axi_base_seq.sv"
     `include "axi_rand_seq.sv"
     `include "axi_sequencer.sv"

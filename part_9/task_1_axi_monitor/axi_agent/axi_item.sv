@@ -16,7 +16,8 @@ class axi_item extends uvm_sequence_item;
 
     constraint len_size_c {
         size * len <= 1024;
-        len % size == 0;
+        len % 2**size == 0;
+        len != 0;
     }
 
     constraint data_c {

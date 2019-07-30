@@ -6,8 +6,11 @@ class axi_env extends uvm_env;
 
     typedef virtual axi_if axi_vif;
 
-    axi_agent   axi_agt;
-    axi_vif     vif;
+    axi_agent       axi_agt_0;
+    axi_agent       axi_agt_1;
+    axi_agent_cfg   axi_agt_cfg_0;
+    axi_agent_cfg   axi_agt_cfg_1;
+    axi_vif         vif;
 
     extern function new(string name, uvm_component parent = null);
     extern function void build_phase(uvm_phase phase);
@@ -25,8 +28,20 @@ endfunction : new
 function void axi_env::build_phase(uvm_phase phase);
     if ( !uvm_config_db#(axi_vif)::get(this, "", "axi_vif", vif) )
         `uvm_fatal("TB|ENV|NO_VIF", "No virtual interface specified")
-    axi_agt = axi_agent#()::type_id::create("axi_agt", this);
-    uvm_config_db#(axi_vif)::set(this, "axi_agt", "axi_vif", vif);
+
+    axi_agt_0 = axi_agent#()::type_id::create("axi_agt_0", this);
+    axi_agt_1 = axi_agent#()::type_id::create("axi_agt_1", this);
+
+    axi_agt_cfg_0 = axi_agent_cfg::type_id::create("axi_agt_0", this);
+    axi_agt_cfg_0.set_master();
+    axi_agt_cfg_1 = axi_agent_cfg::type_id::create("axi_agt_1", this);
+    axi_agt_cfg_1.set_slave();
+
+    uvm_config_db#(axi_agent_cfg)::set(this, "axi_agt_0", "axi_agt_0", axi_agt_cfg_0);
+    uvm_config_db#(axi_agent_cfg)::set(this, "axi_agt_1", "axi_agt_1", axi_agt_cfg_1);
+    
+    uvm_config_db#(axi_vif)::set(this, "axi_agt_0", "axi_vif", vif);
+    uvm_config_db#(axi_vif)::set(this, "axi_agt_1", "axi_vif", vif);
 endfunction : build_phase
 
 function void axi_env::connect_phase(uvm_phase phase);

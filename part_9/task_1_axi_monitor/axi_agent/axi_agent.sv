@@ -33,7 +33,8 @@ endfunction : new
 
 function void axi_agent::build_phase(uvm_phase phase);
     super.build_phase(phase);
-    if( !uvm_config_db#(axi_agent_cfg)::get(this, "", "axi_cfg", axi_agt_cfg) )
+    $display(this.get_name());
+    if( !uvm_config_db#(axi_agent_cfg)::get(this, "", this.get_name(), axi_agt_cfg) )
         `uvm_info("AXI|AGT|NO_CFG", "No agent configuration detected.", UVM_LOW)
     if( axi_agt_cfg == null )
     begin
@@ -51,7 +52,8 @@ function void axi_agent::build_phase(uvm_phase phase);
         end
         else
         begin
-            `uvm_fatal("AXI|AGT|BAD_CFG", "No configuration for AXI slave")
+            axi_drv = axi_driver#()::type_id::create("axi_drv", this);
+            uvm_config_db#(axi_agent_cfg)::set(this, "axi_drv", "axi_cfg", axi_agt_cfg);
         end
     end
     axi_mon = axi_monitor#()::type_id::create("axi_mon",this);
