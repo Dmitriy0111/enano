@@ -59,7 +59,7 @@ log_clean:
 	rm -rfd .log
 
 ########################################################
-# Compile
+# Compile (task_3)
 
 compile_risc_v:
 	mkdir -p program_file
@@ -76,8 +76,30 @@ compile_arm:
 compile_clean:
 	rm -rfd program_file
 
-system_c_test:
-	g++ -ID:\DM\system_c\systemc-2.3.3.tar\systemc-2.3.3\systemc-2.3.3\src -o system_c_test.exe task_2/sc_tb.cpp
+########################################################
+# Systemc (task_2)
 
-system_c_hello:
-	g++ -ID:\DM\system_c\systemc-2.3.3.tar\systemc-2.3.3\systemc-2.3.3\src -std=c++11 -o system_c_hello task_2/sc_hello.cpp
+systemc_test:
+	mkdir -p systemc_exe
+	g++ -I. -I$SYSTEMC_HOME/include -L. -L$SYSTEMC_HOME/lib-linux64 -Wl,-rpath=$SYSTEMC_HOME/lib-linux64 -o systemc_exe/sc_tb task_2/sc_tb.cpp -lsystemc -lm
+
+systemc_hello:
+	mkdir -p systemc_exe
+	g++ -I. -I$SYSTEMC_HOME/include -L. -L$SYSTEMC_HOME/lib-linux64 -Wl,-rpath=$SYSTEMC_HOME/lib-linux64 -o systemc_exe/sc_hello task_2/sc_hello.cpp -lsystemc -lm
+
+systemc_clean:
+	rm -rfd systemc_exe
+
+########################################################
+# Verilog 2 C
+
+v2c:
+	mkdir -p verilator_wf
+	verilator -cc task_my/counter.v verilator_wf/counter_cc.h
+
+v2sc:
+	mkdir -p verilator_wf
+	verilator -sc task_my/counter.v verilator_wf/counter_sc.h
+
+v_clean:
+	rm -rfd verilator_wf

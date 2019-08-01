@@ -79,7 +79,7 @@ function string task_1_item::convert2string();
     $sformat(s, "%sADDR: <0x%h> ", s, addr);
     $sformat(s, "%sDATA: <0x%h>\n", s, data);
     return s;
-endfunction: convert2string
+endfunction : convert2string
 
 task task_1_item::print_ban_data();
     foreach( this.ban_data[i] )
@@ -92,24 +92,27 @@ module task_1;
 
     initial
     begin
+        // randomize ban data
         repeat(200)
             item.add_new_ban_data($urandom_range(0,100));
         item.print_ban_data();
+        // set ban address
         item.add_new_ban_addr(20,100);
         item.add_new_ban_addr(120,200);
+        // randomize transaction with ban address and ban data
         repeat(400)
         begin
             assert( item.randomize() ) else $stop;
-            //item.print();
             $display(item.convert2string());
         end
+        // delete ban address and ban data
         item.delete_ban_addr();
         item.delete_ban_data();
+        // randomize transaction without ban address and ban data
         $display("Random without ban data or addr");
         repeat(400)
         begin
             assert( item.randomize() ) else $stop;
-            //item.print();
             $display(item.convert2string());
         end
         $stop;
