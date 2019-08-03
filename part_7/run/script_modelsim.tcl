@@ -7,11 +7,11 @@ set test "task_1_2"
 if {$test=="task_1_1"} {    
     # compile testbench files
     vlog -f ../run/tb.f
-    #vsim -novopt work.task_1_apb
+    vsim -novopt work.task_1_1
 } elseif {$test=="task_1_2"} {
     # compile testbench files
     vlog -f ../run/tb.f
-    #vsim -novopt work.task_2_apb    
+    vsim -novopt work.task_1_2    
 }
 
 # run simulation

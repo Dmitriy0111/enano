@@ -6,7 +6,8 @@ set test "task_2"
 set test "task_3"
 set test "task_4"
 set test "task_5"
-set test "task_7"
+#set test "task_6"
+#set test "task_7"
 
 if {$test=="task_1"} {    
     # compile testbench files
@@ -28,6 +29,10 @@ if {$test=="task_1"} {
     # compile testbench files
     vlog -f ../run/tb.f
     vsim -novopt work.task_5
+} elseif {$test=="task_6"} {
+    # compile testbench files
+    vlog -f ../run/tb.f
+    vsim -novopt work.task_6
 } elseif {$test=="task_7"} {
     # compile testbench files
     vlog -f ../run/tb.f

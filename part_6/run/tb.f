@@ -3,4 +3,5 @@
 ../task_3.sv
 ../task_4.sv
 ../task_5.sv
+../task_6.sv
 ../task_7.sv

@@ -1,5 +1,11 @@
 class rand_1_1;
 
+    typedef struct packed{
+        logic   [31 : 0]    data_0;
+        logic   [31 : 0]    data_1;
+        integer             freq;
+    } data_i;
+
     typedef enum logic [2 : 0]  { BUSY = 3'b000 , READ = 3'b001 , WRITE = 3'b010 , ERROR = 3'b100 } mode_v;
 
     rand    logic   [31 : 0]    data;
@@ -12,6 +18,18 @@ class rand_1_1;
     //  MODE = 100 -> ERROR 
     logic           [31 : 0]    max_addr = '1;
     logic           [31 : 0]    min_addr = '0;
+
+    data_i                      data_i_ [$] =
+                                                '{
+                                                    '{ 32'h0000_0000 , 32'h5555_5554 , 26 },
+                                                    '{ 32'h5555_5556 , 32'hAAAA_AAA9 , 26 }, 
+                                                    '{ 32'hAAAA_AAAB , 32'hFFFF_FFFF , 26 }, 
+                                                    '{ 32'h5555_5555 , 32'h5555_5555 , 10 }, 
+                                                    '{ 32'hAAAA_AAAA , 32'hAAAA_AAAA , 10 } 
+                                                };
+
+    integer                     freq_sum = 0;
+    integer                     rand_i = 0;
 
     integer                     dist_a[5] = {'0,'0,'0,'0,'0};
 
@@ -35,14 +53,13 @@ class rand_1_1;
     }
 
     constraint data_c {
-        data dist   { 
-                        [32'h0000_0000 : 32'h5555_5554] :/ 25, 
-                        [32'h5555_5556 : 32'hAAAA_AAA9] :/ 25, 
-                        [32'hAAAA_AAAB : 32'hFFFF_FFFF] :/ 25, 
-                        32'h5555_5555 :/ 10, 
-                        32'hAAAA_AAAA :/ 10 
-                    };
+        data inside { [ data_i_[rand_i].data_0 : data_i_[rand_i].data_1 ] };
     }
+
+    function void pre_randomize();
+        rand_i = find_data_i();
+        $display("rand_i = %d", rand_i);
+    endfunction : pre_randomize
 
     function string make_rand();
         string ret_str;
@@ -51,9 +68,12 @@ class rand_1_1;
         return ret_str;
     endfunction : make_rand
 
-    function new (logic [31 : 0] min_addr = '0, logic [31 : 0] max_addr = '1);
+    function new(logic [31 : 0] min_addr = '0, logic [31 : 0] max_addr = '1);
         this.min_addr = min_addr;
         this.max_addr = max_addr;
+        freq_sum = 0;
+        foreach(data_i_[i])
+            freq_sum += data_i_[i].freq;
     endfunction : new
 
     task set_max_addr(logic [31 : 0] max_addr);
@@ -67,29 +87,31 @@ class rand_1_1;
     endtask : set_min_addr
 
     task find_dist_data();
-        if( ( data >= 32'h0000_0000 ) && ( data <= 32'h5555_5554 ) )
-            dist_a[0]++;
-        if( ( data >= 32'h5555_5556 ) && ( data <= 32'hAAAA_AAA9 ) )
-            dist_a[1]++;
-        if( ( data >= 32'hAAAA_AAAB ) && ( data <= 32'hFFFF_FFFF ) )
-            dist_a[2]++;
-        if( data == 32'h5555_5555 )
-            dist_a[3]++;
-        if( data == 32'hAAAA_AAAA )
-            dist_a[4]++;
+        foreach( dist_a[i] )
+            if( ( data >= data_i_[i].data_0 ) && ( data <= data_i_[i].data_1 ) )
+                dist_a[i]++;
     endtask : find_dist_data
 
     task print_dist_data(integer rand_n);
-        $display(" %d, %2.2f%% ", dist_a[0] , dist_a[0] * 100.0 / rand_n );
-        $display(" %d, %2.2f%% ", dist_a[1] , dist_a[1] * 100.0 / rand_n );
-        $display(" %d, %2.2f%% ", dist_a[2] , dist_a[2] * 100.0 / rand_n );
-        $display(" %d, %2.2f%% ", dist_a[3] , dist_a[3] * 100.0 / rand_n );
-        $display(" %d, %2.2f%% ", dist_a[4] , dist_a[4] * 100.0 / rand_n );
+        foreach( dist_a[i] )
+            $display(" data in range [0x%h : 0x%h] %d, %2.2f%% ", data_i_[i].data_0 , data_i_[i].data_1 , dist_a[i] , dist_a[i] * 100.0 / rand_n );
     endtask : print_dist_data
 
     task print_transaction();
         $display("| 0x%h | 0x%h | 0b%b | 0x%b(%s) |", data, addr, strob, mode, mode == 3'b000 ? "BUSY " : mode == 3'b001 ? "READ " : mode == 3'b010 ? "WRITE" : mode == 3'b100 ? "ERROR" : "UNK  " );
     endtask : print_transaction
+
+    function integer find_data_i();
+        integer rand_v;
+        rand_v = $urandom_range(freq_sum-1);
+        for( integer i = 0 ; i < data_i_.size() ; i++ )
+        begin
+            if(rand_v < data_i_[i].freq )
+                return i;
+            rand_v -= data_i_[i].freq;
+        end
+        return 0;
+    endfunction : find_data_i
 
 endclass : rand_1_1
 

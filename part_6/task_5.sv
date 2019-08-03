@@ -1,7 +1,7 @@
 import uvm_pkg::*;
 `include "uvm_macros.svh"
 
-///////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////
 //  Class: task_5_item
 //
 class task_5_item extends uvm_sequence_item;
@@ -27,7 +27,7 @@ function string task_5_item::convert2string();
     $sformat(s, "%sADDR: <0x%h> ", s, addr);
     return s;
 endfunction : convert2string
-///////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////
 //  Class: task_5_base_seq
 //
 class task_5_base_seq extends uvm_sequence#(task_5_item);
@@ -45,7 +45,7 @@ endclass : task_5_base_seq
 function task_5_base_seq::new(string name="task_5_base_seq");
     super.new(name);
 endfunction
-///////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////
 //  Class: task_5_seq
 //
 class task_5_seq extends task_5_base_seq;
@@ -65,7 +65,7 @@ task task_5_seq::body();
     item.randomize();
     `uvm_info(this.get_name() ,item.convert2string(), UVM_LOW);
 endtask : body
-///////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////
 //  Class: task_5_sequencer
 //
 class task_5_sequencer extends uvm_sequencer #(task_5_item);
@@ -76,12 +76,13 @@ class task_5_sequencer extends uvm_sequencer #(task_5_item);
     endfunction : new
 
 endclass : task_5_sequencer
-///////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////
 //  Class: task_5_test
 //
 class task_5_test extends uvm_test;
 
     task_5_sequencer    seqr_0;
+    task_5_sequencer    seqr_1;
     task_5_seq          seq_0;
     task_5_seq          seq_1;
 
@@ -101,6 +102,8 @@ function void task_5_test::build_phase(uvm_phase phase);
     super.build_phase(phase);
     seqr_0 = task_5_sequencer::type_id::create("seqr_0",this);
     
+    seqr_1 = task_5_sequencer::type_id::create("seqr_1",this);
+    
     seq_0 = task_5_seq::type_id::create("seq_0", this);
     
     seq_1 = task_5_seq::type_id::create("seq_1", this);
@@ -116,7 +119,7 @@ task task_5_test::run_phase(uvm_phase phase);
     join
     #200;
 endtask : run_phase
-///////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////
 //  Module: task_5
 //
 module task_5;

@@ -1,5 +1,11 @@
 class rand_1_4;
 
+    typedef struct{
+        logic   [63 : 0]    data_0;
+        logic   [63 : 0]    data_1;
+        integer             freq;
+    } data_i;
+
     typedef enum logic [1 : 0]  { READ = 2'b01 , WRITE = 2'b10 } mode_v;
 
     rand    logic   [63 : 0]    data    [$];
@@ -7,11 +13,24 @@ class rand_1_4;
     rand    logic   [7  : 0]    strob   [$];
     rand    logic   [1  : 0]    mode;
 
-    rand    integer             N;
+    integer                     N;
     //  MODE = 01 -> READ 
     //  MODE = 10 -> WRITE 
 
-    integer                     dist_a[5] = {'0,'0,'0,'0,'0};
+    data_i                      data_i_ [$] =
+                                                '{
+                                                    '{ 64'h0000_0000_0000_0001 , 64'h5555_5555_5555_5554 , 12 },
+                                                    '{ 64'h5555_5555_5555_5556 , 64'hAAAA_AAAA_AAAA_AAA9 , 12 }, 
+                                                    '{ 64'hAAAA_AAAA_AAAA_AAAB , 64'hFFFF_FFFF_FFFF_FFFE , 12 }, 
+                                                    '{ 64'h5555_5555_5555_5555 , 64'h5555_5555_5555_5555 , 25 }, 
+                                                    '{ 64'hAAAA_AAAA_AAAA_AAAA , 64'hAAAA_AAAA_AAAA_AAAA , 25 }, 
+                                                    '{ 64'h0000_0000_0000_0000 , 64'h0000_0000_0000_0000 ,  6 }, 
+                                                    '{ 64'hFFFF_FFFF_FFFF_FFFF , 64'hFFFF_FFFF_FFFF_FFFF ,  6 } 
+                                                };
+
+    integer                     freq_sum = 0;
+    integer                     rand_i[];
+    integer                     dist_a[7] = {'0,'0,'0,'0,'0,'0,'0};
 
     constraint strob_c {
         strob.size() == N;
@@ -27,11 +46,6 @@ class rand_1_4;
         }
     }
 
-    constraint N_c {
-        N > 0;
-        N < 16;
-    }
-
     constraint addr_c {
         addr.size() == N;
         foreach( addr[i] ) {
@@ -40,42 +54,20 @@ class rand_1_4;
         }
     }
 
-    constraint N2addr_data_strobe {
-        solve N before addr, data, strob;
-    }
-
     constraint mode_c {
         mode inside { READ , WRITE };
     }
 
     constraint data_c {
         data.size() == N;
-        foreach( data[i] ) {
-            data[i] dist   { 
-                            [64'h0000_0000_0000_0001 : 64'h5555_5555_5555_5554] :/ 12, 
-                            [64'h5555_5555_5555_5556 : 64'hAAAA_AAAA_AAAA_AAA9] :/ 12, 
-                            [64'hAAAA_AAAA_AAAA_AAAB : 64'hFFFF_FFFF_FFFF_FFFE] :/ 12, 
-                            64'h5555_5555_5555_5555 :/ 25, 
-                            64'hAAAA_AAAA_AAAA_AAAA :/ 25,
-                            64'h0000_0000_0000_0000 :/ 6,
-                            64'hFFFF_FFFF_FFFF_FFFF :/ 6
-                        };
-        }
+        foreach( data[i] )
+            data[i] inside { [ data_i_[rand_i[i]].data_0 : data_i_[rand_i[i]].data_1 ] };
     }
 
     function string make_rand(ref integer N , ref logic [63 : 0] data [$], ref logic [31  : 0] addr [$], ref logic [7 : 0] strob [$], ref logic [1 : 0] mode );
         string ret_str;
         assert( this.randomize() ) else $stop;
-        // data.delete();
-        // addr.delete();
-        // strob.delete();
 
-        // foreach( this.data[i] )
-        //     data.push_back(this.data[i]);
-        // foreach( this.addr[i] )
-        //     addr.push_back(this.addr[i]);
-        // foreach( this.strob[i] )
-        //     strob.push_back(this.strob[i]);
         N = this.N;
         data = this.data;
         addr = this.addr;
@@ -95,36 +87,41 @@ class rand_1_4;
         return ret_str;
     endfunction : make_rand
 
-    function new ();
+    function void pre_randomize();
+        N = $urandom_range(1,15);
+        rand_i = new[N];
+        foreach( rand_i[i] )
+            rand_i[i] = find_data_i();
+    endfunction : pre_randomize
+
+    function integer find_data_i();
+        integer rand_v;
+        rand_v = $urandom_range(freq_sum-1);
+        for( integer i = 0 ; i < data_i_.size() ; i++ )
+        begin
+            if(rand_v < data_i_[i].freq )
+                return i;
+            rand_v -= data_i_[i].freq;
+        end
+        return 0;
+    endfunction : find_data_i
+
+    function new();
+        freq_sum = 0;
+        foreach(data_i_[i])
+            freq_sum += data_i_[i].freq;
     endfunction : new
 
     task find_dist_data();
-        foreach( data[i] )
-        begin
-            if  ( 
-                    ( data[i] != 64'h0000_0000_0000_0000 ) &&
-                    ( data[i] != 64'hFFFF_FFFF_FFFF_FFFF ) &&
-                    ( data[i] != 64'h5555_5555_5555_5555 ) &&
-                    ( data[i] != 64'hAAAA_AAAA_AAAA_AAAA )
-                )
-                dist_a[0]++;
-            if( data[i] == 64'h0000_0000_0000_0000 )
-                dist_a[1]++;
-            if( data[i] == 64'hFFFF_FFFF_FFFF_FFFF )
-                dist_a[2]++;
-            if( data[i] == 64'h5555_5555_5555_5555 )
-                dist_a[3]++;
-            if( data[i] == 64'hAAAA_AAAA_AAAA_AAAA )
-                dist_a[4]++;
-        end
+        foreach( dist_a[i] )
+            foreach( data[j] )
+                if( ( data[j] >= data_i_[i].data_0 ) && ( data[j] <= data_i_[i].data_1 ) )
+                    dist_a[i]++;
     endtask : find_dist_data
 
     task print_dist_data(integer rand_n);
-        $display(" %d, %2.2f%% ", dist_a[0] , dist_a[0] * 100.0 / ( dist_a[0] + dist_a[1] + dist_a[2] + dist_a[3] + dist_a[4] ) );
-        $display(" %d, %2.2f%% ", dist_a[1] , dist_a[1] * 100.0 / ( dist_a[0] + dist_a[1] + dist_a[2] + dist_a[3] + dist_a[4] ) );
-        $display(" %d, %2.2f%% ", dist_a[2] , dist_a[2] * 100.0 / ( dist_a[0] + dist_a[1] + dist_a[2] + dist_a[3] + dist_a[4] ) );
-        $display(" %d, %2.2f%% ", dist_a[3] , dist_a[3] * 100.0 / ( dist_a[0] + dist_a[1] + dist_a[2] + dist_a[3] + dist_a[4] ) );
-        $display(" %d, %2.2f%% ", dist_a[4] , dist_a[4] * 100.0 / ( dist_a[0] + dist_a[1] + dist_a[2] + dist_a[3] + dist_a[4] ) );
+        foreach( dist_a[i] )
+            $display(" data in range [0x%h : 0x%h] %d, %2.2f%% ", data_i_[i].data_0 , data_i_[i].data_1 , dist_a[i] , dist_a[i] * 100.0 / ( dist_a[0] + dist_a[1] + dist_a[2] + dist_a[3] + dist_a[4] + dist_a[5] + dist_a[6] ) );
     endtask : print_dist_data
 
     task print_transaction();

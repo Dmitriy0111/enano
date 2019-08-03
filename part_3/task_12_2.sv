@@ -1,5 +1,11 @@
 class rand_1_2;
 
+    typedef struct packed{
+        logic   [127 : 0]   data_0;
+        logic   [127 : 0]   data_1;
+        integer             freq;
+    } data_i;
+
     typedef enum logic [2 : 0]  { BUSY = 3'b000 , READ = 3'b001 , WRITE = 3'b010 , ERROR = 3'b100 } mode_v;
     typedef enum logic [0 : 0]  { OK = '1 , UNDEF = '0 } status_v;
 
@@ -14,7 +20,20 @@ class rand_1_2;
     //  MODE = 100 -> ERROR 
     logic           [31 : 0]    max_user_addr = '1;
 
-    integer                     dist_a[5] = {'0,'0,'0,'0,'0};
+    data_i                      data_i_ [$] =
+                                                '{
+                                                    '{ 128'h0000_0000_0000_0000_0000_0000_0000_0001 , 128'h5555_5555_5555_5555_5555_5555_5555_5554 , 25 },
+                                                    '{ 128'h5555_5555_5555_5555_5555_5555_5555_5556 , 128'hAAAA_AAAA_AAAA_AAAA_AAAA_AAAA_AAAA_AAA9 , 25 }, 
+                                                    '{ 128'hAAAA_AAAA_AAAA_AAAA_AAAA_AAAA_AAAA_AAAB , 128'hFFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFE , 25 }, 
+                                                    '{ 128'h5555_5555_5555_5555_5555_5555_5555_5555 , 128'h5555_5555_5555_5555_5555_5555_5555_5555 , 10 }, 
+                                                    '{ 128'hAAAA_AAAA_AAAA_AAAA_AAAA_AAAA_AAAA_AAAA , 128'hAAAA_AAAA_AAAA_AAAA_AAAA_AAAA_AAAA_AAAA , 10 }, 
+                                                    '{ 128'h0000_0000_0000_0000_0000_0000_0000_0000 , 128'h0000_0000_0000_0000_0000_0000_0000_0000 , 1  }, 
+                                                    '{ 128'hFFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF , 128'hFFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF , 1  } 
+                                                };
+
+    integer                     freq_sum = 0;
+    integer                     rand_i = 0;
+    integer                     dist_a[7] = {'0,'0,'0,'0,'0,'0,'0};
 
     constraint strob_c {
         strob == ('1 << addr[2 : 0]);
@@ -41,15 +60,7 @@ class rand_1_2;
     }
 
     constraint data_c {
-        data dist   { 
-                        [128'h0000_0000_0000_0000_0000_0000_0000_0001 : 128'h5555_5555_5555_5555_5555_5555_5555_5555] :/ 25 ,
-                        [128'h5555_5555_5555_5555_5555_5555_5555_5556 : 128'hAAAA_AAAA_AAAA_AAAA_AAAA_AAAA_AAAA_AAA9] :/ 25 , 
-                        [128'hAAAA_AAAA_AAAA_AAAA_AAAA_AAAA_AAAA_AAAB : 128'hFFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFE] :/ 25 , 
-                        128'h5555_5555_5555_5555_5555_5555_5555_5555 :/ 10 , 
-                        128'hAAAA_AAAA_AAAA_AAAA_AAAA_AAAA_AAAA_AAAA :/ 10 ,
-                        128'h0000_0000_0000_0000_0000_0000_0000_0000 :/ 1 ,
-                        128'hFFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF :/ 1
-                    };
+        data inside { [ data_i_[rand_i].data_0 : data_i_[rand_i].data_1 ] };
     }
 
     function string make_rand(ref logic [127 : 0] data , ref logic [31  : 0] addr , ref logic [15 : 0] strob , ref logic [2 : 0] mode , ref logic [0 : 0] status);
@@ -64,8 +75,28 @@ class rand_1_2;
         return ret_str;
     endfunction : make_rand
 
-    function new (logic [31 : 0] max_user_addr = '1);
+    function void pre_randomize();
+        rand_i = find_data_i();
+        $display("rand_i = %d", rand_i);
+    endfunction : pre_randomize
+
+    function integer find_data_i();
+        integer rand_v;
+        rand_v = $urandom_range(freq_sum-1);
+        for( integer i = 0 ; i < data_i_.size() ; i++ )
+        begin
+            if(rand_v < data_i_[i].freq )
+                return i;
+            rand_v -= data_i_[i].freq;
+        end
+        return 0;
+    endfunction : find_data_i
+
+    function new(logic [31 : 0] max_user_addr = '1);
         this.max_user_addr = max_user_addr;
+        freq_sum = 0;
+        foreach(data_i_[i])
+            freq_sum += data_i_[i].freq;
     endfunction : new
 
     task set_max_user_addr(logic [31 : 0] max_user_addr);
@@ -74,29 +105,14 @@ class rand_1_2;
     endtask : set_max_user_addr
 
     task find_dist_data();
-        if  ( 
-                ( data != 128'h0000_0000_0000_0000_0000_0000_0000_0000 ) &&
-                ( data != 128'hFFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF ) &&
-                ( data != 128'h5555_5555_5555_5555_5555_5555_5555_5555 ) &&
-                ( data != 128'hAAAA_AAAA_AAAA_AAAA_AAAA_AAAA_AAAA_AAAA )
-            )
-            dist_a[0]++;
-        if( data == 128'h0000_0000_0000_0000_0000_0000_0000_0000 )
-            dist_a[1]++;
-        if( data == 128'hFFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF_FFFF )
-            dist_a[2]++;
-        if( data == 128'h5555_5555_5555_5555_5555_5555_5555_5555 )
-            dist_a[3]++;
-        if( data == 128'hAAAA_AAAA_AAAA_AAAA_AAAA_AAAA_AAAA_AAAA )
-            dist_a[4]++;
+        foreach( dist_a[i] )
+            if( ( data >= data_i_[i].data_0 ) && ( data <= data_i_[i].data_1 ) )
+                dist_a[i]++;
     endtask : find_dist_data
 
     task print_dist_data(integer rand_n);
-        $display(" %d, %2.2f%% ", dist_a[0] , dist_a[0] * 100.0 / rand_n );
-        $display(" %d, %2.2f%% ", dist_a[1] , dist_a[1] * 100.0 / rand_n );
-        $display(" %d, %2.2f%% ", dist_a[2] , dist_a[2] * 100.0 / rand_n );
-        $display(" %d, %2.2f%% ", dist_a[3] , dist_a[3] * 100.0 / rand_n );
-        $display(" %d, %2.2f%% ", dist_a[4] , dist_a[4] * 100.0 / rand_n );
+        foreach( dist_a[i] )
+            $display(" data in range [0x%h : 0x%h] %d, %2.2f%% ", data_i_[i].data_0 , data_i_[i].data_1 , dist_a[i] , dist_a[i] * 100.0 / rand_n );
     endtask : print_dist_data
 
     task print_transaction();
