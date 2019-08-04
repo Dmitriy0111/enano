@@ -3,18 +3,14 @@
 module counter_tb();
 
     parameter   T = 10,
-                rst_delay = 7,
-                cw = 8;
+                rst_delay = 7;
 
-    reg     [0    : 0]  clk;
-    reg     [0    : 0]  resetn;
-    reg     [0    : 0]  dir;
-    wire    [cw-1 : 0]  c_out;
+    reg     [0 : 0]     clk;
+    reg     [0 : 0]     resetn;
+    reg     [0 : 0]     dir;
+    wire    [7 : 0]     c_out;
 
     counter
-    #(
-        .cw     ( cw        )
-    )
     counter_0
     (
         .clk    ( clk       ),

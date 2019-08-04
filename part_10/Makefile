@@ -81,25 +81,36 @@ compile_clean:
 
 systemc_test:
 	mkdir -p systemc_exe
-	g++ -I. -I$SYSTEMC_HOME/include -L. -L$SYSTEMC_HOME/lib-linux64 -Wl,-rpath=$SYSTEMC_HOME/lib-linux64 -o systemc_exe/sc_tb task_2/sc_tb.cpp -lsystemc -lm
+	g++ -I. -I$(SYSTEMC_HOME)/include -L. -L$(SYSTEMC_HOME)/lib-linux64 -Wl,-rpath=$(SYSTEMC_HOME)/lib-linux64 -o systemc_exe/sc_tb task_2/sc_tb.cpp -lsystemc -lm
 
 systemc_hello:
 	mkdir -p systemc_exe
-	g++ -I. -I$SYSTEMC_HOME/include -L. -L$SYSTEMC_HOME/lib-linux64 -Wl,-rpath=$SYSTEMC_HOME/lib-linux64 -o systemc_exe/sc_hello task_2/sc_hello.cpp -lsystemc -lm
+	g++ -I. -I$(SYSTEMC_HOME)/include -L. -L$(SYSTEMC_HOME)/lib-linux64 -Wl,-rpath=$(SYSTEMC_HOME)/lib-linux64 -o systemc_exe/sc_hello task_2/sc_hello.cpp -lsystemc -lm
+	g++ -I. -I/usr/local/systemc-2.3.3/include  -L.  -L/usr/local/systemc-2.3.3/lib-linux64 -Wl,-rpath=/usr/local/systemc-2.3.3/lib-linux64 counter_tb_sc.o verilated.o Vcounter__ALL.a    -o Vcounter -lm -lstdc++ -lsystemc
+
+systemc_counter:
+	mkdir -p systemc_exe
+	g++ -I. -I$(SYSTEMC_HOME)/include -I$(VERILATOR_INC) -L. -L$(SYSTEMC_HOME)/lib-linux64 -Wl,-rpath=$(SYSTEMC_HOME)/lib-linux64 -o systemc_exe/sc_hello task_my/counter_tb_sc.cpp -lsystemc -lm
+	verilator -sc  -Wall 
 
 systemc_clean:
 	rm -rfd systemc_exe
+
+verilator_counter:
+	verilator -sc --exe task_my/counter.v task_my/counter_tb_sc.cpp
+	$(MAKE) -j 4 -C obj_dir -f Vcounter.mk
+	obj_dir/Vcounter
 
 ########################################################
 # Verilog 2 C
 
 v2c:
 	mkdir -p verilator_wf
-	verilator -cc task_my/counter.v verilator_wf/counter_cc.h
+	verilator -cc task_my/counter.v -Wall
 
 v2sc:
 	mkdir -p verilator_wf
-	verilator -sc task_my/counter.v verilator_wf/counter_sc.h
+	verilator -sc task_my/counter.v -Wall
 
 v_clean:
 	rm -rfd verilator_wf

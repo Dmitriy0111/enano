@@ -1,8 +1,8 @@
-#include <systemc.h>
+#include "systemc.h"
 
-#include <verilated.h>
+#include "verilated.h"
 
-#include "../verilator_wf/counter_sc.h"
+#include "../obj_dir/Vcounter.h"
 
 int sc_main(int argc, char* argv[]) {
 
@@ -16,47 +16,48 @@ int sc_main(int argc, char* argv[]) {
     
     ios::sync_with_stdio();
 
-    sc_time sc_time_(1.0, sc_ns);
-    sc_set_default_time_unit(sc_time_);
+    sc_time sc_time_(1.0, SC_NS);
+    //sc_set_default_time_unit(1,SC_NS);
 
-    sc_clock clk("clk", 10, sc_ns, 0.5, 3, sc_ns, true);
+    sc_clock clk("clk", 10, SC_NS, 0.5, 3, SC_NS, true);
     // defining signals
-    sc_signal<sc_bv<1>>     resetn;
-    sc_signal<sc_bv<1>>     dir;
-    sc_signal<sc_bv<8>>     c_out;
+    sc_signal<bool>         resetn;
+    sc_signal<bool>         dir;
+    sc_signal<uint32_t>     c_out;
     // creating verilated module for counter design
-    counter_sc* counter_sc_ = new counter_sc("counter_sc");
+    Vcounter* sc_counter = new Vcounter("counter_sc");
     // connecting verilated model to testbench signals
-    counter_sc_->clk    ( clk       );
-    counter_sc_->resetn ( resetn    );
-    counter_sc_->dir    ( dir       );
-    counter_sc_->c_out  ( c_out     );
+    sc_counter->clk    ( clk       );
+    sc_counter->resetn ( resetn    );
+    sc_counter->dir    ( dir       );
+    sc_counter->c_out  ( c_out     );
 
-    sc_start(1, sc_ns);
+    resetn = 0;
+    dir = 0;
 
-    while (!Verilated::gotFinish()) {
-        resetn = 0;
-        dir = 0;
-        sc_start(1, sc_ns);
-        cout << sc_time_stamp() << "ns, dir = " << dir ? "+" : "-" << ", c_out = 0x" << hex << c_out << endl;
+    for(int i=0;i<7;i++)
+    {
+        sc_start(10, SC_NS);
     }
 
-    for(integer i = 0 ; i < 400 ; i++) {
+    resetn = 1;
+
+    for(int i = 0 ; i < 400 ; i++) {
         dir = 0;
-        sc_start(1, sc_ns);
-        cout << sc_time_stamp() << "ns, dir = " << dir ? "+" : "-" << ", c_out = 0x" << hex << c_out << endl;
+        sc_start(10, SC_NS);
+        cout << sc_time_stamp() << ", dir = " << ( dir ? "+" : "-" ) << ", c_out = 0x" << hex << c_out << endl;
     }
 
-    for(integer i = 0 ; i < 400 ; i++) {
+    for(int i = 0 ; i < 400 ; i++) {
         dir = 1;
-        sc_start(1, sc_ns);
-        cout << sc_time_stamp() << "ns, dir = " << dir ? "+" : "-" << ", c_out = 0x" << hex << c_out << endl;
+        sc_start(10, SC_NS);
+        cout << sc_time_stamp() << ", dir = " << ( dir ? "+" : "-" ) << ", c_out = 0x" << hex << c_out << endl;
     }
 
-    counter_sc_->final();
+    sc_counter->final();
 
-    delete counter_sc_;
-    counter_sc_ = NULL;
+    delete sc_counter;
+    sc_counter = NULL;
 
     return 0;
 }
