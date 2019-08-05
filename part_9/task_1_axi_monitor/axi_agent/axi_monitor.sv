@@ -43,7 +43,7 @@ function void axi_monitor::connect_phase(uvm_phase phase);
 endfunction : connect_phase
 
 task axi_monitor::run_phase(uvm_phase phase);
-    forever
+    repeat(30)
     fork
         pars_waddr_ch();
         pars_wdata_ch();

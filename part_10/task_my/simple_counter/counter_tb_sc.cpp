@@ -6,7 +6,23 @@
 
 int sc_main(int argc, char* argv[]) {
 
+    int cw = 8;
+    int repeat_n = 400;
+
     if( 0 && argv && argc ) {}
+    if (argc > 1) {
+		for (int i = 1; i < argc; i++) {
+			cout << "Argument " << i << " = " << argv[i] << endl;
+			if( strcmp(argv[i] , "-gcw") == 0 ) {
+				cw = atoi(argv[i+1]);
+                cout << "Counter width overload by " << cw << endl;
+            }
+			if( strcmp(argv[i] , "-grepeat_n") == 0 ) {
+				repeat_n = atoi(argv[i+1]);
+                cout << "Repeat number overload by " << repeat_n << endl;
+            }
+		}
+	}
 
     Verilated::debug(0);
 
@@ -16,16 +32,23 @@ int sc_main(int argc, char* argv[]) {
     
     ios::sync_with_stdio();
 
+    sc_trace_file* sc_tf;
+    sc_tf = sc_create_vcd_trace_file("simple_counter.vcd");
+
     sc_time sc_time_(1.0, SC_NS);
-    //sc_set_default_time_unit(1,SC_NS);
 
     sc_clock clk("clk", 10, SC_NS, 0.5, 3, SC_NS, true);
     // defining signals
     sc_signal<bool>         resetn;
     sc_signal<bool>         dir;
-    sc_signal<uint32_t>     c_out;
+    sc_signal<sc_bv<cw>>    c_out;
+
+    sc_trace( sc_tf , clk    , "clk"    );
+    sc_trace( sc_tf , resetn , "resetn" );
+    sc_trace( sc_tf , dir    , "dir"    );
+    sc_trace( sc_tf , c_out  , "c_out"  );
     // creating verilated module for counter design
-    Vcounter* sc_counter = new Vcounter("counter_sc");
+    Vcounter*<cw> sc_counter = new Vcounter("counter_sc");
     // connecting verilated model to testbench signals
     sc_counter->clk    ( clk       );
     sc_counter->resetn ( resetn    );
@@ -42,13 +65,13 @@ int sc_main(int argc, char* argv[]) {
 
     resetn = 1;
 
-    for(int i = 0 ; i < 400 ; i++) {
+    for(int i = 0 ; i < repeat_n ; i++) {
         dir = 0;
         sc_start(10, SC_NS);
         cout << sc_time_stamp() << ", dir = " << ( dir ? "+" : "-" ) << ", c_out = 0x" << hex << c_out << endl;
     }
 
-    for(int i = 0 ; i < 400 ; i++) {
+    for(int i = 0 ; i < repeat_n ; i++) {
         dir = 1;
         sc_start(10, SC_NS);
         cout << sc_time_stamp() << ", dir = " << ( dir ? "+" : "-" ) << ", c_out = 0x" << hex << c_out << endl;
@@ -58,6 +81,8 @@ int sc_main(int argc, char* argv[]) {
 
     delete sc_counter;
     sc_counter = NULL;
+    
+    sc_close_vcd_trace_file(sc_tf);
 
     return 0;
 }

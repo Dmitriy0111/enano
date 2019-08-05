@@ -61,7 +61,7 @@ task axi_driver::run_phase(uvm_phase phase);
                 vif.BVALID   = '0;
                 vif.RREADY   = '0;
                 vif.BREADY   = '0;
-                forever
+                repeat(30)
                 begin
                     axi_item item;
                     integer i;
@@ -69,7 +69,6 @@ task axi_driver::run_phase(uvm_phase phase);
                     logic   [1023 : 0]  test_logic;
                     seq_item_port.get_next_item(item);
                     $display(item.convert2string);
-                    item.print();
                     if( item.axi_rw_ == 1 )
                     begin
                         vif.AWADDR   = item.addr;
@@ -136,9 +135,10 @@ task axi_driver::run_phase(uvm_phase phase);
                 vif.RRESP   = '0;
                 vif.RVALID  = '0;
                 vif.WREADY  = '0;
-                forever
+                repeat(30)
                 begin
                     @(posedge vif.ACLK);
+                    #0;
                     if( vif.AWVALID )
                     begin
                         repeat($urandom_range(1,4))

@@ -14,7 +14,7 @@ function axi_rand_seq::new(string name = "axi_rand_seq");
 endfunction : new
 
 task axi_rand_seq::body();
-    repeat(100)
+    repeat(30)
     begin
         axi_item_ = axi_item::type_id::create("axi_item");
         axi_item_.randomize();
