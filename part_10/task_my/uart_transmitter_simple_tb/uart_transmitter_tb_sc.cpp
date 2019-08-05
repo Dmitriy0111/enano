@@ -21,7 +21,7 @@ int sc_main(int argc, char** argv) {
     ios::sync_with_stdio();
 
     sc_trace_file* sc_tf;
-    sc_tf = sc_create_vcd_trace_file("uart_transmitter.vcd");
+    sc_tf = sc_create_vcd_trace_file("uart_transmitter");
 
     sc_time sc_time_(1.0, SC_NS);
 
@@ -70,7 +70,7 @@ int sc_main(int argc, char** argv) {
     delete sc_dut;
     sc_dut = NULL;
 
-    sc_close_vcd_file(sc_tf);
+    sc_close_vcd_trace_file(sc_tf);
 
     return 0;
 

@@ -87,7 +87,7 @@ int sc_main(int argc, char** argv) {
     delete sc_dut;
     sc_dut = NULL;
 
-    sc_close_vcd_file(sc_tf);
+    sc_close_vcd_trace_file(sc_tf);
 
     return 0;
 
