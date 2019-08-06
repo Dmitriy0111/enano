@@ -23,7 +23,7 @@ int sc_main(int argc, char** argv) {
     ios::sync_with_stdio();
 
     sc_trace_file* sc_tf;
-    sc_tf = sc_create_vcd_trace_file("uart_transmitter.vcd");
+    sc_tf = sc_create_vcd_trace_file("uart_transmitter");
 
     sc_time sc_time_(1.0, SC_NS);
 
@@ -46,10 +46,8 @@ int sc_main(int argc, char** argv) {
     sc_trace( sc_tf , req_ack , "req_ack" );
     sc_trace( sc_tf , uart_tx , "uart_tx" );
 
+    // Creating design under test and connect to signals
     Vuart_transmitter* sc_dut = new Vuart_transmitter("sc_dut");
-    uart_transmitter_driver* sc_drv = new uart_transmitter_driver("sc_drv");
-    uart_transmitter_monitor* sc_mon = new uart_transmitter_monitor("sc_mon");
-
     sc_dut->clk     ( clk       );
     sc_dut->resetn  ( resetn    );
     sc_dut->comp    ( comp      );
@@ -58,7 +56,8 @@ int sc_main(int argc, char** argv) {
     sc_dut->req     ( req       );
     sc_dut->req_ack ( req_ack   );
     sc_dut->uart_tx ( uart_tx   );
-
+    // Creating driver and connect to signals
+    uart_transmitter_driver* sc_drv = new uart_transmitter_driver("sc_drv");
     sc_drv->clk     ( clk       );
     sc_drv->resetn  ( resetn    );
     sc_drv->tx_data ( tx_data   );
@@ -66,7 +65,8 @@ int sc_main(int argc, char** argv) {
     sc_drv->tr_en   ( tr_en     );
     sc_drv->req     ( req       );
     sc_drv->req_ack ( req_ack   );
-
+    // Creating monitor and connect to signals
+    uart_transmitter_monitor* sc_mon = new uart_transmitter_monitor("sc_mon");
     sc_mon->uart_tx ( uart_tx   );
     sc_mon->clk     ( clk       );
     sc_mon->resetn  ( resetn    );

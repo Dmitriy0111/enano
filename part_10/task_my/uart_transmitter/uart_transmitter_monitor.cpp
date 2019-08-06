@@ -11,33 +11,37 @@
     ---------------------------------
 */
 
-void uart_transmitter_monitor::monitor_proc(); {
+void uart_transmitter_monitor::monitor_proc() {
     uint32_t rec_data = 0;
     uint32_t comp_v = 0;
-    for(;;;) {
+    do{
+        wait()
+    } while( resetn != true )
+    for( int c = 0 ; c < 20 ; c++ ) {
         do {
-            wait(10, SC_NS);
+            wait();
         } while( uart_tx != false )
         comp_v = comp;
         rec_data = 0;
         // Start
         for( int i = 0 ; i < comp_v ; i++ ) {
-            wait(10, SC_NS);
+            wait();
         }
         // Receive data
         for( int j = 0 ; j < 8 ; j++ ){
             for( int i = 0 ; i < comp_v / 2 ; i++ ) {
-                wait(10, SC_NS);
+                wait();
             }
             rec_data |= ( ( uart_tx == true ) ? 1 : 0 ) << j;
             for( int i = 0 ; i < comp_v / 2 ; i++ ) {
-                wait(10, SC_NS);
+                wait();
             }
         }
         // Stop
         for( int i = 0 ; i < comp_v ; i++ ) {
-            wait(10, SC_NS);
+            wait();
         }
         cout << "Receive data = 0x" << rec_data << hex << endl;
     }
+    sc_stop();
 }

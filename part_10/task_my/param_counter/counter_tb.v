@@ -59,7 +59,7 @@ module counter_tb();
 
     initial
     begin
-        $dumpfile("counter_tb.vcd");
+        $dumpfile("param_counter_tb.vcd");
         $dumpvars(0,counter_tb);
     end
 

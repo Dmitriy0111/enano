@@ -12,7 +12,6 @@ SC_MODULE( uart_transmitter_driver ) {
     void driver_proc();
 
     SC_CTOR(uart_transmitter_driver){
-        SC_THREAD(driver_proc);
-        sensitive_pos(clk);
+        SC_THREAD( driver_proc , clk.pos() );
     }
 }

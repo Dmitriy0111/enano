@@ -131,3 +131,9 @@ verilator_uart_transmitter_simple_tb:
 	verilator -sc --exe task_my/uart_transmitter_simple_tb/uart_transmitter.v task_my/uart_transmitter_simple_tb/uart_transmitter_tb_sc.cpp
 	$(MAKE) -j 4 -C obj_dir -f Vuart_transmitter.mk
 	obj_dir/Vuart_transmitter
+
+verilator_uart_transmitter_sc_tb_system:
+	rm -rfd obj_dir
+	verilator -sc --exe task_my/uart_transmitter/uart_transmitter.v task_my/uart_transmitter/sc_tb_system.cpp
+	$(MAKE) -j 4 -C obj_dir -f Vuart_transmitter.mk
+	obj_dir/Vuart_transmitter

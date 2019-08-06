@@ -4,7 +4,7 @@ vlib work
 set test "task_1"
 set test "simple_counter"
 set test "param_counter"
-set test "uart_transmitter_simple_tb"
+#set test "uart_transmitter_simple_tb"
 
 if {$test=="task_1"} {    
     set i0 +incdir+../task_1
@@ -16,7 +16,7 @@ if {$test=="task_1"} {
     vsim -novopt work.counter_tb
 } elseif {$test=="param_counter"} {
     vlog ../task_my/param_counter/counter.v ../task_my/param_counter/counter_tb.v 
-    vsim -novopt work.counter_tb -grepeat_n=400 -gcw=8
+    vsim -novopt work.counter_tb -grepeat_n=400 -gcw=8 -viewcov
 } elseif {$test=="uart_transmitter_simple_tb"} {
     vlog ../task_my/uart_transmitter/uart_transmitter.v ../task_my/uart_transmitter/uart_transmitter_tb.sv
     vsim -novopt work.uart_transmitter_tb

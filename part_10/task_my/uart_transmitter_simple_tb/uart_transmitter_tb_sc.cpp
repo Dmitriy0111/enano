@@ -4,7 +4,7 @@
 
 #include "../obj_dir/Vuart_transmitter.h"
 
-void clean_signals(sc_signal<bool>* resetn, sc_signal<uint32_t>* comp, sc_signal<bool>* tr_en, sc_signal<uint32_t>* tx_data, sc_signal<bool>* req){
+void clean_signals(sc_signal<bool>* resetn, sc_signal<uint32_t>* comp, sc_signal<bool>* tr_en, sc_signal<uint32_t>* tx_data, sc_signal<bool>* req) {
     *resetn = false;
     *tr_en = false;
     *req = false;
@@ -12,7 +12,30 @@ void clean_signals(sc_signal<bool>* resetn, sc_signal<uint32_t>* comp, sc_signal
     *tx_data = 0;
 }
 
+void write_uart(sc_signal<uint32_t>* comp, sc_signal<bool>* tr_en, sc_signal<uint32_t>* tx_data, sc_signal<bool>* req) {
+    tx_data = rand() % 255;
+    cout << "Random tx data = 0x" << tx_data << hex;
+    switch( rand % 4 ) {
+        case 0:     comp = 50000000 / 9600;   cout << "random baudrate = 9600"   << endl; break;
+        case 1:     comp = 50000000 / 19200;  cout << "random baudrate = 19200"  << endl; break;
+        case 2:     comp = 50000000 / 38400;  cout << "random baudrate = 38400"  << endl; break;
+        case 3:     comp = 50000000 / 57600;  cout << "random baudrate = 57600"  << endl; break;
+        case 4:     comp = 50000000 / 115200; cout << "random baudrate = 115200" << endl; break;
+        default:    comp = 50000000 / 9600;   cout << "random baudrate = 9600"   << endl; break;
+    }
+    tr_en = true;
+    req = true;
+    wait(10, SC_NS);
+    req = false;
+    do {
+        wait(10, SC_NS);
+    } while( req_ack != true )
+    wait(10, SC_NS);
+}
+
 int sc_main(int argc, char** argv) {
+
+    int repeat_c = 20;
 
     Verilated::debug(0);
     Verilated::randReset(2);
@@ -55,15 +78,23 @@ int sc_main(int argc, char** argv) {
     sc_dut->req_ack ( req_ack   );
     sc_dut->uart_tx ( uart_tx   );
 
+    sc_start();
+
     resetn = 0;
     clean_signals(&resetn, &comp, &tr_en, &tx_data, &req);
 
     for(int i=0;i<7;i++)
     {
-        sc_start(10, SC_NS);
+        wait(10, SC_NS);
     }
 
     resetn = 1;
+
+    for( int i = 0 ; i < repeat_c ; i++ ) {
+        write_uart(&comp, &tr_en, &tx_data, &req);
+    }
+
+    sc_stop();
 
     sc_dut->final();
 

@@ -25,6 +25,8 @@ int sc_main(int argc, char* argv[]) {
 		}
 	}
 
+    const int cw_c = cw;
+
     Verilated::debug(0);
 
     Verilated::randReset(2);
@@ -34,7 +36,7 @@ int sc_main(int argc, char* argv[]) {
     ios::sync_with_stdio();
 
     sc_trace_file* sc_tf;
-    sc_tf = sc_create_vcd_trace_file("simple_counter");
+    sc_tf = sc_create_vcd_trace_file("param_counter");
 
     sc_time sc_time_(1.0, SC_NS);
 
@@ -42,14 +44,14 @@ int sc_main(int argc, char* argv[]) {
     // defining signals
     sc_signal<bool>         resetn;
     sc_signal<bool>         dir;
-    sc_signal<sc_bv<cw>>    c_out;
+    sc_signal<sc_bv<cw_c>>  c_out;
 
     sc_trace( sc_tf , clk    , "clk"    );
     sc_trace( sc_tf , resetn , "resetn" );
     sc_trace( sc_tf , dir    , "dir"    );
     sc_trace( sc_tf , c_out  , "c_out"  );
     // creating verilated module for counter design
-    Vcounter*<cw> sc_counter = new Vcounter("counter_sc");
+    Vcounter*<cw_c> sc_counter = new Vcounter("counter_sc");
     // connecting verilated model to testbench signals
     sc_counter->clk    ( clk       );
     sc_counter->resetn ( resetn    );

@@ -100,5 +100,11 @@ module uart_transmitter_tb();
             read_uart();
         $stop;
     end
+
+    initial
+    begin
+        $dumpfile("uart_transmitter_tb.vcd");
+        $dumpvars(0,counter_tb);
+    end
     
 endmodule : uart_transmitter_tb

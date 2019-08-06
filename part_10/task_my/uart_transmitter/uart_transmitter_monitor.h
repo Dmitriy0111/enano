@@ -9,7 +9,6 @@ SC_MODULE( uart_transmitter_monitor ) {
     void monitor_proc();
 
     SC_CTOR(uart_transmitter_monitor){
-        SC_THREAD(monitor_proc);
-        sensitive_pos(clk);
+        SC_THREAD( monitor_proc , clk.pos() );
     }
 }

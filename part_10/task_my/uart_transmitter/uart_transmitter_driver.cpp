@@ -14,7 +14,16 @@
     ---------------------------------
 */
 
-void uart_transmitter_driver::driver_proc(); {
+void uart_transmitter_driver::driver_proc() {
+    // start sim
+    resetn.write(0);
+    tx_data.write(0);
+    comp.write(0);
+    tr_en.write(0);
+    for( int i = 0 ; i < 7 ; i++ ) {
+        wait();
+    }
+    resetn = 1;
     for(;;;) {
         tx_data = rand() % 255;
         cout << "Random tx data = 0x" << tx_data << hex;
@@ -44,13 +53,13 @@ void uart_transmitter_driver::driver_proc(); {
                 cout << "random baudrate = 9600" << endl;
                 break;
         }
-        tr_en = true;
-        req = true;
-        wait(10, SC_NS);
-        req = false;
+        tr_en.write(1);
+        req.write(1);
+        wait();
+        req.write(0);
         do {
-            wait(10, SC_NS);
+            wait();
         } while( req_ack != true )
-        wait(10, SC_NS);
+        wait();
     }
 }
