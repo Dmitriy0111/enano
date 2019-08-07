@@ -20,7 +20,7 @@ class apb_agent#(type apb_vif = virtual apb_if) extends uvm_agent;
         `uvm_field_object( apb_sqr     , UVM_DEFAULT )
     `uvm_component_utils_end
 
-    extern function new(string name = "apb_agent", uvm_component parent = null);
+    extern function      new(string name = "apb_agent", uvm_component parent = null);
     extern function void build_phase(uvm_phase phase);
     extern function void connect_phase(uvm_phase phase);
     

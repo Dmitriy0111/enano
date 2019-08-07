@@ -10,10 +10,10 @@ class axi_driver#(type axi_vif = virtual axi_if) extends uvm_driver#(axi_item);
     axi_agent_cfg       axi_drv_cfg;
     bit     [0 : 0]     is_master;
 
-    extern function new(string name = "axi_driver", uvm_component parent = null);
+    extern function      new(string name = "axi_driver", uvm_component parent = null);
     extern function void build_phase(uvm_phase phase);
     extern function void connect_phase(uvm_phase phase);
-    extern task run_phase(uvm_phase phase);
+    extern task          run_phase(uvm_phase phase);
     
     
 endclass : axi_driver

@@ -8,10 +8,10 @@ class apb_driver#(type apb_vif = virtual apb_if) extends uvm_driver#(apb_item);
 
     apb_vif             vif;
 
-    extern function new(string name = "apb_driver", uvm_component parent = null);
+    extern function      new(string name = "apb_driver", uvm_component parent = null);
     extern function void build_phase(uvm_phase phase);
     extern function void connect_phase(uvm_phase phase);
-    extern task run_phase(uvm_phase phase);
+    extern task          run_phase(uvm_phase phase);
     
 endclass : apb_driver
 

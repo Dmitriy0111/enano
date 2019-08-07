@@ -9,10 +9,10 @@ class ahb_monitor#(type ahb_vif = virtual ahb_if) extends uvm_monitor;
     uvm_analysis_port   #( ahb_item )   ahb_mon_ap;
     ahb_vif                             vif;
 
-    extern function new(string name = "ahb_monitor", uvm_component parent = null);
+    extern function      new(string name = "ahb_monitor", uvm_component parent = null);
     extern function void build_phase(uvm_phase phase);
     extern function void connect_phase(uvm_phase phase);
-    extern task run_phase(uvm_phase phase);
+    extern task          run_phase(uvm_phase phase);
    
 endclass : ahb_monitor
 

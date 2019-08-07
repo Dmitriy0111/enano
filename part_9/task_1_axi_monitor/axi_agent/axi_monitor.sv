@@ -17,13 +17,13 @@ class axi_monitor#(type axi_vif = virtual axi_if) extends uvm_monitor;
 
     integer         wdata_size = 0;
 
-    extern function new(string name = "axi_monitor", uvm_component parent = null);
+    extern function      new(string name = "axi_monitor", uvm_component parent = null);
     extern function void build_phase(uvm_phase phase);
     extern function void connect_phase(uvm_phase phase);
-    extern task run_phase(uvm_phase phase);
-    extern task pars_waddr_ch();
-    extern task pars_wdata_ch();
-    extern task pars_raddr_ch();
+    extern task          run_phase(uvm_phase phase);
+    extern task          pars_waddr_ch();
+    extern task          pars_wdata_ch();
+    extern task          pars_raddr_ch();
    
 endclass : axi_monitor
 

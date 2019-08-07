@@ -4,8 +4,8 @@
 class axi_rand_seq extends axi_base_seq;
     `uvm_object_utils(axi_rand_seq)
 
-    extern function new(string name = "axi_rand_seq");
-    extern virtual task body();
+    extern         function new(string name = "axi_rand_seq");
+    extern virtual task     body();
 
 endclass : axi_rand_seq
 

@@ -12,11 +12,11 @@ class axi_env extends uvm_env;
     axi_agent_cfg   axi_agt_cfg_1;
     axi_vif         vif;
 
-    extern function new(string name, uvm_component parent = null);
+    extern function      new(string name, uvm_component parent = null);
     extern function void build_phase(uvm_phase phase);
     extern function void connect_phase(uvm_phase phase);
-    extern task pre_reset_phase(uvm_phase phase);
-    extern task reset_phase(uvm_phase phase);
+    extern task          pre_reset_phase(uvm_phase phase);
+    extern task          reset_phase(uvm_phase phase);
     extern function void report_phase(uvm_phase phase);
 
 endclass : axi_env

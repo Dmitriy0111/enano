@@ -4,8 +4,8 @@
 class ahb_rand_seq extends ahb_base_seq;
     `uvm_object_utils(ahb_rand_seq)
 
-    extern function new(string name = "ahb_rand_seq");
-    extern virtual task body();
+    extern         function new(string name = "ahb_rand_seq");
+    extern virtual task     body();
 
 endclass : ahb_rand_seq
 

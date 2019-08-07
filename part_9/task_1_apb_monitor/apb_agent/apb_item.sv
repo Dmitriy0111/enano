@@ -17,7 +17,7 @@ class apb_item extends uvm_sequence_item;
         `uvm_field_enum ( apb_rw , apb_rw_ , UVM_DEFAULT )
     `uvm_object_utils_end
 
-    extern function new(string name = "apb_item");
+    extern function        new(string name = "apb_item");
     extern function string convert2string();
     
 endclass : apb_item

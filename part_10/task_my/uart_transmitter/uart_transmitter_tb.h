@@ -1,4 +1,4 @@
-#include "system.c"
+#include "systemc.h"
 
 #include "verilated.h"
 
@@ -6,7 +6,7 @@
 #include "uart_transmitter_monitor.cpp"
 #include "../obj_dir/Vuart_transmitter.h"
 
-SC_MODULE( system ) {
+SC_MODULE( uart_transmitter_tb ) {
     uart_transmitter_driver     *drv;
     uart_transmitter_monitor    *mon;
     Vuart_transmitter           *dut;
@@ -21,7 +21,7 @@ SC_MODULE( system ) {
 
     sc_clock                    clk;
 
-    SC_CTOR( system ) : clk("clk", 10, SC_NS) {
+    SC_CTOR( uart_transmitter_tb ) : clk("clk", 10, SC_NS) {
         // Creating driver and connect to signals
         drv = new uart_transmitter_driver( "drv" );
         drv->clk        ( clk       );
@@ -49,7 +49,7 @@ SC_MODULE( system ) {
         dut->uart_tx    ( uart_tx   );
     }
 
-    ~system() {
+    ~uart_transmitter_tb() {
         delete dut;
         delete drv;
         delete mon;

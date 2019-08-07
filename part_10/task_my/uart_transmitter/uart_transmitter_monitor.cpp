@@ -15,12 +15,12 @@ void uart_transmitter_monitor::monitor_proc() {
     uint32_t rec_data = 0;
     uint32_t comp_v = 0;
     do{
-        wait()
-    } while( resetn != true )
+        wait();
+    } while( ! resetn.read() );
     for( int c = 0 ; c < 20 ; c++ ) {
         do {
             wait();
-        } while( uart_tx != false )
+        } while( uart_tx != false );
         comp_v = comp;
         rec_data = 0;
         // Start

@@ -4,8 +4,8 @@
 class apb_rand_seq extends apb_base_seq;
     `uvm_object_utils(apb_rand_seq)
 
-    extern function new(string name = "apb_rand_seq");
-    extern virtual task body();
+    extern         function new(string name = "apb_rand_seq");
+    extern virtual task     body();
 
 endclass : apb_rand_seq
 

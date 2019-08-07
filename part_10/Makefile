@@ -116,6 +116,8 @@ verilator_simple_counter:
 	$(MAKE) -j 4 -C obj_dir -f Vcounter.mk
 	$(info Run Vcounter test)
 	obj_dir/Vcounter
+	$(info See vcd diagrams)
+	gtkwave simple_counter.vcd
 
 verilator_param_counter:
 	rm -rfd obj_dir
@@ -125,15 +127,19 @@ verilator_param_counter:
 	$(MAKE) -j 4 -C obj_dir -f Vcounter.mk
 	$(info Run Vcounter test)
 	obj_dir/Vcounter
+	$(info See vcd diagrams)
+	gtkwave param_counter.vcd
 
 verilator_uart_transmitter_simple_tb:
 	rm -rfd obj_dir
 	verilator -sc --exe task_my/uart_transmitter_simple_tb/uart_transmitter.v task_my/uart_transmitter_simple_tb/uart_transmitter_tb_sc.cpp
 	$(MAKE) -j 4 -C obj_dir -f Vuart_transmitter.mk
 	obj_dir/Vuart_transmitter
+	gtkwave uart_transmitter.vcd
 
 verilator_uart_transmitter_sc_tb_system:
 	rm -rfd obj_dir
 	verilator -sc --exe task_my/uart_transmitter/uart_transmitter.v task_my/uart_transmitter/sc_tb_system.cpp
 	$(MAKE) -j 4 -C obj_dir -f Vuart_transmitter.mk
 	obj_dir/Vuart_transmitter
+	gtkwave sc_tb_system.vcd

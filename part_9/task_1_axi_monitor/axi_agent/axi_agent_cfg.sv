@@ -13,7 +13,7 @@ class axi_agent_cfg extends uvm_object;
         `uvm_field_int( is_active , UVM_DEFAULT )
     `uvm_object_utils_end
 
-    extern function new(string name = "axi_agent_cfg");
+    extern function      new(string name = "axi_agent_cfg");
     extern function void set_default();
     extern function void set_passive();
     extern function void set_master();

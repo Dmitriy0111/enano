@@ -9,7 +9,7 @@ class axi_base_test extends uvm_test;
     axi_env     env;
     axi_vif     vif;
 
-    extern function new(string name, uvm_component parent = null);
+    extern function      new(string name, uvm_component parent = null);
     extern function void build_phase(uvm_phase phase);
     extern function void start_of_simulation_phase(uvm_phase phase);
     

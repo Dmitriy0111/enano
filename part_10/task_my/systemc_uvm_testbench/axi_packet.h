@@ -1,5 +1,5 @@
-#ifndef AXI_PACKET
-#define AXI_PACKET
+#ifndef AXI_PACKET__H
+#define AXI_PACKET__H
 
 #include "systemc.h"
 #include "tlm.h"
@@ -40,12 +40,12 @@ class axi_packet : public uvm::uvm_sequence_item
         {
             const axi_packet* drhs = dynamic_cast<const axi_packet*>(&rhs);
             if (!drhs) { std::cerr << "ERROR in do_compare" << std::endl; return true; }
-            if (!(addr  = drhs->addr )) return false;
-            if (!(data  = drhs->data )) return false;
-            if (!(size  = drhs->size )) return false;
-            if (!(len   = drhs->len  )) return false;
-            if (!(burst = drhs->burst)) return false;
-            if (!(rw    = drhs->rw   )) return false;
+            if (!(addr  == drhs->addr )) return false;
+            if (!(data  == drhs->data )) return false;
+            if (!(size  == drhs->size )) return false;
+            if (!(len   == drhs->len  )) return false;
+            if (!(burst == drhs->burst)) return false;
+            if (!(rw    == drhs->rw   )) return false;
             return true;
         }
 
@@ -57,7 +57,7 @@ class axi_packet : public uvm::uvm_sequence_item
                 << "| SIZE  | 0x" << size  << hex
                 << "| LEN   | 0x" << len   << hex
                 << "| BURST | 0x" << burst << hex
-                << "| RW    | "   << ( rw == 1 ) ? "READ" : "WRITE" << endl;
+                << "| RW    | "   << ( ( rw == 1 ) ? "READ" : "WRITE" ) << endl;
             return str.str();
         }
 
@@ -70,4 +70,4 @@ class axi_packet : public uvm::uvm_sequence_item
         sc_bv<1   >     rw;
 };
 
-#endif /* AXI_PACKET_ */
+#endif // AXI_PACKET__H

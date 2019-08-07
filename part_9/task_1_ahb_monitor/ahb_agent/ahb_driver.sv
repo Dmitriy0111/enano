@@ -8,10 +8,10 @@ class ahb_driver#(type ahb_vif = virtual ahb_if) extends uvm_driver#(ahb_item);
 
     ahb_vif             vif;
 
-    extern function new(string name = "ahb_driver", uvm_component parent = null);
+    extern function      new(string name = "ahb_driver", uvm_component parent = null);
     extern function void build_phase(uvm_phase phase);
     extern function void connect_phase(uvm_phase phase);
-    extern task run_phase(uvm_phase phase);
+    extern task          run_phase(uvm_phase phase);
     
 endclass : ahb_driver
 

@@ -40,32 +40,35 @@ int sc_main(int argc, char* argv[]) {
     sc_counter->dir    ( dir       );
     sc_counter->c_out  ( c_out     );
 
+    sc_start();
+
     resetn = 0;
     dir = 0;
 
     for(int i=0;i<7;i++)
     {
-        sc_start(10, SC_NS);
+        wait();
     }
 
     resetn = 1;
 
     for(int i = 0 ; i < 400 ; i++) {
         dir = 0;
-        sc_start(10, SC_NS);
+        wait();
         cout << sc_time_stamp() << ", dir = " << ( dir ? "+" : "-" ) << ", c_out = 0x" << hex << c_out << endl;
     }
 
     for(int i = 0 ; i < 400 ; i++) {
         dir = 1;
-        sc_start(10, SC_NS);
+        wait();
         cout << sc_time_stamp() << ", dir = " << ( dir ? "+" : "-" ) << ", c_out = 0x" << hex << c_out << endl;
     }
+
+    sc_stop();
 
     sc_counter->final();
 
     delete sc_counter;
-    sc_counter = NULL;
     
     sc_close_vcd_trace_file(sc_tf);
 

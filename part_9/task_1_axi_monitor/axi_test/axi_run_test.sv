@@ -7,7 +7,7 @@ class axi_run_test extends axi_base_test;
     axi_rand_seq    seq0;
 
     extern function new(string name, uvm_component parent = null);
-    extern task main_phase(uvm_phase phase);
+    extern task     main_phase(uvm_phase phase);
     
 endclass : axi_run_test
 

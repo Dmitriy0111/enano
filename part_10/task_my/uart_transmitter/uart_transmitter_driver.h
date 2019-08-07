@@ -2,7 +2,7 @@
 
 SC_MODULE( uart_transmitter_driver ) {
     sc_in   <bool>      clk;
-    sc_in   <bool>      resetn;
+    sc_out  <bool>      resetn;
     sc_out  <uint32_t>  tx_data;
     sc_out  <uint32_t>  comp;
     sc_out  <bool>      tr_en;
@@ -12,6 +12,7 @@ SC_MODULE( uart_transmitter_driver ) {
     void driver_proc();
 
     SC_CTOR(uart_transmitter_driver){
-        SC_THREAD( driver_proc , clk.pos() );
+        SC_THREAD( driver_proc );
+        sensitive << clk.posedge_event();
     }
-}
+};

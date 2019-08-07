@@ -9,10 +9,10 @@ class apb_monitor#(type apb_vif = virtual apb_if) extends uvm_monitor;
     uvm_analysis_port   #( apb_item )   apb_mon_ap;
     apb_vif                             vif;
 
-    extern function new(string name = "apb_monitor", uvm_component parent = null);
+    extern function      new(string name = "apb_monitor", uvm_component parent = null);
     extern function void build_phase(uvm_phase phase);
     extern function void connect_phase(uvm_phase phase);
-    extern task run_phase(uvm_phase phase);
+    extern task          run_phase(uvm_phase phase);
    
 endclass : apb_monitor
 
