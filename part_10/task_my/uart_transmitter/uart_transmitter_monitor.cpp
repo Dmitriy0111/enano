@@ -42,6 +42,7 @@ void uart_transmitter_monitor::monitor_proc() {
             wait();
         }
         cout << "Receive data = 0x" << rec_data << hex << endl;
+        monitor_tx_data.push(rec_data);
     }
     sc_stop();
 }

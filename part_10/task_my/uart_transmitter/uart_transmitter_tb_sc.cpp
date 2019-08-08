@@ -5,14 +5,12 @@
 #include "../obj_dir/Vuart_transmitter.h"
 #include "uart_transmitter_driver.h"
 #include "uart_transmitter_monitor.h"
+#include <queue>
 
-void clean_signals(sc_signal<bool>* resetn, sc_signal<uint32_t>* comp, sc_signal<bool>* tr_en, sc_signal<uint32_t>* tx_data, sc_signal<bool>* req){
-    *resetn = false;
-    *tr_en = false;
-    *req = false;
-    *comp = 0;
-    *tx_data = 0;
-}
+using namespace std;
+
+queue<uint32_t> driver_tx_data;
+queue<uint32_t> monitor_tx_data;
 
 int sc_main(int argc, char** argv) {
 
@@ -72,20 +70,24 @@ int sc_main(int argc, char** argv) {
     sc_mon->resetn  ( resetn    );
     sc_mon->comp    ( comp      );
 
-    resetn = 0;
-    clean_signals(&resetn, &comp, &tr_en, &tx_data, &req);
-
-    for(int i=0;i<7;i++)
-    {
-        sc_start(10, SC_NS);
-    }
-
-    resetn = 1;
+    sc_start();
 
     sc_dut->final();
 
     delete sc_dut;
-    sc_dut = NULL;
+    delete sc_mon;
+    delete sc_drv;
+
+    for( int i = 0 ; i < 20 ; i++ ){
+        uint32_t mon_data = monitor_tx_data.front();
+        uint32_t drv_data = driver_tx_data.front();
+        monitor_tx_data.pop();
+        driver_tx_data.pop();
+        if( mon_data == drv_data )
+            cout << "Test pass!" << " MON received data = 0x" << mon_data << hex << " DRV received data = 0x" << drv_data << hex << endl;
+        else
+            cout << "Test fail!" << " MON received data = 0x" << mon_data << hex << " DRV received data = 0x" << drv_data << hex << endl;
+    }
 
     sc_close_vcd_trace_file(sc_tf);
 

@@ -4,7 +4,8 @@ vlib work
 set test "task_1"
 set test "simple_counter"
 set test "param_counter"
-#set test "uart_transmitter_simple_tb"
+set test "uart_transmitter_simple_tb"
+set test "alu_simple_tb"
 
 if {$test=="task_1"} {    
     set i0 +incdir+../task_1
@@ -20,6 +21,9 @@ if {$test=="task_1"} {
 } elseif {$test=="uart_transmitter_simple_tb"} {
     vlog ../task_my/uart_transmitter/uart_transmitter.v ../task_my/uart_transmitter/uart_transmitter_tb.sv
     vsim -novopt work.uart_transmitter_tb
+} elseif {$test=="alu_simple_tb"} {
+    vlog ../task_my/alu_simple_tb/alu.v ../task_my/alu_simple_tb/alu_simple_tb.sv
+    vsim -novopt work.alu_simple_tb
 }
 
 

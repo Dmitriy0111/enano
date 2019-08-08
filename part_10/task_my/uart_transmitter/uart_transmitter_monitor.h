@@ -1,5 +1,11 @@
 #include "systemc.h"
 
+#include <queue>
+
+using namespace std;
+
+extern queue<uint32_t> monitor_tx_data;
+
 SC_MODULE( uart_transmitter_monitor ) {
     sc_in   <bool>      clk;
     sc_in   <bool>      resetn;
@@ -10,6 +16,6 @@ SC_MODULE( uart_transmitter_monitor ) {
 
     SC_CTOR(uart_transmitter_monitor){
         SC_THREAD( monitor_proc );
-        sensitive << clk.posedge_event();
+        sensitive_pos( clk );
     }
 };

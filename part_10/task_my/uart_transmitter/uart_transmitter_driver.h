@@ -1,4 +1,9 @@
 #include "systemc.h"
+#include <queue>
+
+using namespace std;
+
+extern queue<uint32_t> driver_tx_data;
 
 SC_MODULE( uart_transmitter_driver ) {
     sc_in   <bool>      clk;
@@ -13,6 +18,6 @@ SC_MODULE( uart_transmitter_driver ) {
 
     SC_CTOR(uart_transmitter_driver){
         SC_THREAD( driver_proc );
-        sensitive << clk.posedge_event();
+        sensitive_pos( clk );
     }
 };

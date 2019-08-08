@@ -16,6 +16,7 @@
 
 void uart_transmitter_driver::driver_proc() {
     // start sim
+    uint32_t rand_tx_data;
     resetn.write(0);
     tx_data.write(0);
     comp.write(0);
@@ -25,8 +26,10 @@ void uart_transmitter_driver::driver_proc() {
     }
     resetn.write(1);
     for(;;) {
-        tx_data = rand() % 255;
-        cout << "Random tx data = 0x" << tx_data << hex;
+        rand_tx_data = rand() % 255;
+        tx_data = rand_tx_data;
+        cout << "Random tx data = 0x" << rand_tx_data << hex;
+        driver_tx_data.push( rand_tx_data );
         switch( rand() % 4 ) {
             case 0:     comp.write( 50000000 / 9600   ); cout << "random baudrate = 9600"   << endl; break;
             case 1:     comp.write( 50000000 / 19200  ); cout << "random baudrate = 19200"  << endl; break;
@@ -36,6 +39,7 @@ void uart_transmitter_driver::driver_proc() {
             default:    comp.write( 50000000 / 9600   ); cout << "random baudrate = 9600"   << endl; break;
         }
         tr_en.write(1);
+        wait();
         req.write(1);
         wait();
         req.write(0);

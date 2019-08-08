@@ -14,7 +14,7 @@ class axi_subscriber : public uvm::uvm_subscriber<axi_packet>
         
         axi_subscriber( uvm_component_name name ) : uvm_subscriber<axi_packet>( name )
         {
-	        std::cout << sc_time_stamp() << ": constructor " << name << std::endl;
+            std::cout << sc_time_stamp() << ": constructor " << name << std::endl;
         }
 
         void write(const axi_packet& p)
