@@ -4,7 +4,7 @@ import      uvm_pkg::*;
 class ctrl extends uvm_reg;
     `uvm_object_utils(ctrl)
 
-    //defining register fields
+    // defining register fields
     rand    uvm_reg_field   st1;
     rand    uvm_reg_field   st2;
     rand    uvm_reg_field   sum1;
@@ -19,7 +19,7 @@ class ctrl extends uvm_reg;
         st2     = uvm_reg_field::type_id::create( "st2"    );
         sum1    = uvm_reg_field::type_id::create( "sum1"   );
         unused  = uvm_reg_field::type_id::create( "unused" );
-        // вызываем для каждого поля метод конфигурации
+        
         st1     .configure( this , 2  , 0  , "RW" , 0 , 2'b00                   , 1 , 1 , 0 );
         st2     .configure( this , 6  , 3  , "RO" , 0 , 6'b00_0000              , 1 , 1 , 0 );
         sum1    .configure( this , 8  , 9  , "RO" , 0 , 8'b0000_0000            , 1 , 1 , 0 );
@@ -31,7 +31,7 @@ endclass : ctrl
 class data_in extends uvm_reg;
     `uvm_object_utils(data_in)
 
-    //defining register fields
+    // defining register fields
     rand    uvm_reg_field   data;
 
     function new(string name = "data_in");
@@ -40,7 +40,7 @@ class data_in extends uvm_reg;
 
     virtual function void build();
         data = uvm_reg_field::type_id::create( "data" );
-        // вызываем для каждого поля метод конфигурации
+        
         data.configure( this , 32 , 0 , "RW" , 0 , 32'h00_00_00_00 , 1 , 1 , 0 );
     endfunction : build
     
@@ -49,7 +49,7 @@ endclass : data_in
 class data_out extends uvm_reg;
     `uvm_object_utils(data_out)
 
-    //defining register fields
+    // defining register fields
     rand    uvm_reg_field   data;
 
     function new(string name = "data_out");
@@ -180,6 +180,64 @@ function custom_predictor::new(string name = "custom_predictor", uvm_component p
 endfunction : new
 
 ////////////////////////////////////////////////////////////////////
+//  Class: ahb_base_seq
+//
+class ahb_base_seq extends uvm_sequence#(ahb_pkt);
+    
+    ahb_pkt    item;
+
+    `uvm_object_utils(ahb_base_seq);
+
+    extern function new(string name = "ahb_base_seq");
+    
+endclass: ahb_base_seq
+
+function ahb_base_seq::new(string name = "ahb_base_seq");
+    super.new(name);
+endfunction : new
+
+////////////////////////////////////////////////////////////////////
+//  Class: ahb_direct_seq
+//
+class ahb_direct_seq extends ahb_base_seq;
+
+    `uvm_object_utils(ahb_direct_seq);
+
+    extern function new(string name = "ahb_direct_seq");
+    extern virtual task body();
+    
+endclass: ahb_direct_seq
+
+function ahb_direct_seq::new(string name = "ahb_direct_seq");
+    super.new(name);
+endfunction : new
+
+task ahb_direct_seq::body();
+    repeat(20)
+    begin
+        item = ahb_pkt::type_id::create("item");
+        item.randomize();
+        item.print();
+        //start_item(item);
+        //finish_item(item);
+    end
+endtask : body
+
+////////////////////////////////////////////////////////////////////
+//  Class: ahb_sequencer
+//
+class ahb_sequencer extends uvm_sequencer#(ahb_pkt);
+    `uvm_component_utils(ahb_sequencer);
+
+    extern function new(string name = "ahb_sequencer", uvm_component parent = null);
+    
+endclass : ahb_sequencer
+
+function ahb_sequencer::new(string name = "ahb_sequencer", uvm_component parent = null);
+    super.new(name, parent);
+endfunction : new
+
+////////////////////////////////////////////////////////////////////
 //  Class: reg_env
 //
 class reg_env extends uvm_env;
@@ -188,11 +246,14 @@ class reg_env extends uvm_env;
     task_1_1_reg_block              task_1_1_reg_block_;
     reg2ahb_adapter                 reg2ahb_adapter_;
     uvm_reg_predictor   #(ahb_pkt)  reg_predictor;
+    ahb_sequencer                   ahb_sqr;
+    ahb_direct_seq                  seq_0;
 
-    extern function new(string name = "reg_env", uvm_component parent);
+    extern function      new(string name = "reg_env", uvm_component parent);
     extern function void build_phase(uvm_phase phase);
     extern function void connect_phase(uvm_phase phase);
-
+    extern task          run_phase(uvm_phase phase);
+    
 endclass : reg_env
 
 function reg_env::new(string name = "reg_env", uvm_component parent);
@@ -205,15 +266,26 @@ function void reg_env::build_phase(uvm_phase phase);
     reg2ahb_adapter_    = reg2ahb_adapter               ::type_id::create( "reg2ahb_adapter_"    , this );
     reg_predictor       = uvm_reg_predictor#(ahb_pkt)   ::type_id::create( "reg_predictor"       , this );
 
+    seq_0               = ahb_direct_seq                ::type_id::create( "seq_0"               , this );
+    ahb_sqr             = ahb_sequencer                 ::type_id::create( "ahb_sqr"             , this );
+
     task_1_1_reg_block_.build();
     task_1_1_reg_block_.lock_model();
 endfunction : build_phase
 
 function void reg_env::connect_phase(uvm_phase phase);
     super.connect_phase(phase);
+    task_1_1_reg_block_.default_map.set_sequencer(ahb_sqr, reg2ahb_adapter_);
+
     reg_predictor.map = task_1_1_reg_block_.default_map;
     reg_predictor.adapter = reg2ahb_adapter_;
+
 endfunction : connect_phase
+
+task reg_env::run_phase(uvm_phase phase);
+    super.run_phase(phase);
+    seq_0.start(ahb_sqr);
+endtask : run_phase
 
 ////////////////////////////////////////////////////////////////////
 //  Class: task_1_1_test

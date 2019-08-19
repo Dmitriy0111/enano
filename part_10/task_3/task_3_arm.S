@@ -9,6 +9,6 @@ init:
                 movw    r1, #:lower16:TEST_DATA 
                 movt    r1, #:upper16:TEST_DATA 
 store_data:
-	            str     r1, [r0]
+                str     r1, [r0]
 while_1:
-	            b       while_1
+                b       while_1
